@@ -50,28 +50,29 @@ crates:["...o..o.....","..CCC.CC....","............","GGGGGGGGGGGG","###########
 /* ------------------------------------------------------------------ levels */
 var LEVELS=[
  {name:'FARMYARD',theme:'farm',goal:'barn',en:{e:'goose',f:'cowboy',t:'sheepdog'},
-  seq:['start','flat','gap2','flat2','enemy','stairs','flat','pitplat','chk','hill','lane','enemy2','gap2','crates','rails','goal']},
+  hz:['fence','trap','fence'],seq:['start','flat','gap2','flat2','enemy','stairs','hazard','flat','pitplat','chk','hill','lane','thorns','enemy2','gap2','crates','rails','goal']},
  {name:'THE BIG BARN',theme:'barn',goal:'barnout',en:{e:'goat',f:'cowboy',t:'goat'},
-  seq:['start','flat','loft','enemy','tower','gap2','chk','islands','enemy2','stairs','loft','lane','crates','goal']},
+  hz:['porc'],seq:['start','flat','loft','enemy','tower','gap2','chk','islands','hazard','enemy2','stairs','loft','lane','crates','goal']},
  {name:'BACK PASTURE',theme:'farm',goal:'gate',en:{e:'sheepdog',f:'cowboy',t:'fox'},
-  seq:['start','flat2','enemy','gap3','hillE','rails','chk','pitplat','enemy2','thorns','lane','cratepit','chk','hill','double','goal']},
+  hz:['fence','porc'],seq:['start','flat2','enemy','gap3','hillE','rails','chk','pitplat','enemy2','thorns','lane','cratepit','chk','hill','double','goal']},
  {name:'THE NEIGHBORHOOD',theme:'houses',goal:'signTown',en:{e:'dog',f:'officer',t:'dog'},
-  seq:['start','flat','enemy','rails','gap3','enemy2','chk','hazard','tower','islands','double','chk','hillE','awnings','goal']},
+  hz:['trap'],seq:['start','flat','enemy','rails','gap3','enemy2','chk','hazard','tower','islands','double','chk','hillE','awnings','goal']},
  {name:'MAIN STREET',theme:'town',goal:'bakery',en:{e:'dog',f:'officer',t:'officer'},
-  seq:['start','flat2','awnings','enemy2','gap3','pitplat','chk','double','cratepit','humans','stairs','chk','awnings','gap4','enemy2','goal']},
+  hz:['trap'],seq:['start','flat2','awnings','enemy2','gap3','pitplat','chk','double','hazard','cratepit','humans','stairs','chk','awnings','gap4','enemy2','goal']},
  {name:'TOWN AT NIGHT',theme:'townNight',goal:'signHome',en:{e:'dog',f:'officer',t:'officer'},
-  seq:['start','flat','humans','gap4','awnings','chk','cratepit','double','tower','chk','bigpit','enemy2','thorns','awnings','humans','goal']},
+  hz:['trap'],seq:['start','flat','humans','gap4','awnings','chk','cratepit','double','tower','chk','bigpit','enemy2','thorns','awnings','humans','goal']},
  {name:'THE WOODS',theme:'woods',goal:'signHome',en:{e:'fox',f:'wolf',t:'wolf'},
-  seq:['start','flat2','enemy','gap3','lane','islands','chk','hillE','bigpit','double','chk','thorns','cratepit','lane','rollhi','enemy2','goal']},
+  hz:['porc'],seq:['start','flat2','enemy','gap3','lane','islands','chk','hillE','bigpit','double','chk','thorns','cratepit','lane','rollhi','enemy2','goal']},
  {name:'BACKYARDS',theme:'yards',goal:'signHome',en:{e:'dog',f:'officer',t:'sheepdog'},
-  seq:['start','flat','rails','double','gap4','enemy2','chk','tower','islands','hazard','humans','chk','pitplat','bigpit','lane','awnings','double','goal']},
+  hz:['porc'],seq:['start','flat','rails','double','gap4','enemy2','chk','tower','islands','hazard','humans','chk','pitplat','bigpit','lane','thorns','awnings','double','goal']},
  {name:'BACK ROADS',theme:'corn',goal:'signHome',en:{e:'fox',f:'cowboy',t:'wolf'},
-  seq:['start','flat2','lane','gap4','hillE','thorns','chk','enemy2','bigpit','double','cratepit','chk','islands','lane','humans','gap4','rollhi','goal']},
+  hz:['fence','trap'],seq:['start','flat2','lane','gap4','hillE','thorns','chk','enemy2','bigpit','double','cratepit','chk','islands','lane','humans','gap4','rollhi','goal']},
  {name:'HOME FARM',theme:'home',goal:'home',en:{e:'sheepdog',f:'cowboy',t:'goat'},
-  seq:['start','flat','double','gap4','loft','chk','lane','bigpit','humans','tower','chk','thorns','islands','double','cratepit','chk','hillE','lane','goal']}
+  hz:['fence'],seq:['start','flat','double','gap4','loft','chk','lane','bigpit','humans','tower','chk','thorns','islands','double','cratepit','chk','hillE','lane','goal']}
 ];
 
 var SOLID={G:1,'#':1,H:1,C:1};
+var HZH={fence:12,porc:10,trap:6};   // hurt-box height of each hazard, from the ground up
 function buildLevel(i){
   var L=LEVELS[i],rows=[],r,c;
   for(r=0;r<ROWS;r++)rows.push('');
@@ -94,6 +95,9 @@ function buildLevel(i){
       else if(k==='e'||k==='f'||k==='t'){lv.enemies.push({type:L.en[k],tx:x,ty:(r+1)*T});line[c]='.'}
     }
     lv.grid.push(line)}
+  // hazards: each run of x tiles gets a kind from the level's mix (electric fence, porcupine, snap trap)
+  lv.hz={};var run=0,mix=L.hz||['trap'];
+  for(r=0;r<ROWS;r++)for(c=0;c<lv.w;c++)if(lv.grid[r][c]==='x'){if(c===0||lv.grid[r][c-1]!=='x')run++;lv.hz[c+','+r]=mix[(run-1)%mix.length]}
   if(!lv.start||!lv.goal)throw new Error('level '+i+' missing start/goal');
   return lv}
 
@@ -205,6 +209,8 @@ var HUM_L={a:["....kook.kook...","....kook.kook...","....kook.kook...","....kOOk
 var COWBOY=["......kkkk......",".....khhhhk.....",".....khbbhk.....","..kkkkhhhhkkkk..",".khhhhhhhhhhhhk.","..kkkkkkkkkkkk..","....kssssssk....","....ksssseskk...","....kssssssssk..",".....kRRRRRk....","....kgRRRggk....","...kggggggggk...","...kgvggggvgk...","...ksvvvvvvsk...","...kkoooooookk..","....kOOOOOOk...."];
 var COWBOY_L={a:["....kook.kook...","....kook.kook...","....kBBk.kBBk...","....kBBk.kBBk...","....kBBBkkBBBk..","....kBBBkkBBBk..","....kkkkkkkkkk..","................"],
  b:["...kook..kook...","..kook....kook..","..kBBk....kBBk..",".kBBBk....kBBBk.",".kBBBk....kBBBk.",".kkkkk....kkkkk.","................","................"]};
+var PORC=["...w...w...w....","..q.w.q.w.q.w...",".w.q.qwq.qwq.q..","..qdqdqdqdqdqdw.",".wdQdQdQdQdQdq..","..QQQQQQQQQQQQd.","kQQQQQQQQQQQQQq.","reQQQQQQQQQQQQ..","rrrQQQQQQQQQQ...",".kkkkkkkkkkkk...","..f.f.....f.f..."];
+var TRAP=["s..............s","st............ts","sst..........tss",".st.t......t.ts.",".s............s.","..sssssDDsssss..",".dddddddddddddd.","dddddddddddddddd"];
 var COOKIE=["....llll....","..llllllll..",".llcllllvll.",".llllllllll.","lllllpllllll","llvllllllcll","llllllllllll",".lllcllllll.",".lllllllvll.","..llllllll..","....llll...."];
 var ROLL=["...wwwwww...",".wwvvvvvvww.","wwvwwwwwwvww","wvwwvvvvwwvw","wvwvwwwwvwvw","wvwvwvvwvwvw","wvwvwwvwvwvw","wvwwvvvwwwvw","wwvwwwwwwvww",".wwvvvvvvww.","...wwwwww..."];
 var POP=["..pppp..",".phhppp.","phhppppp","phpppcpp","pcpppPpp","pppppPpp",".ppPPcp.",".pppppp.","..pppp..","...ww...","...ww...","...ww...","...ww...","...ww..."];
@@ -261,6 +267,9 @@ function mount(host,api){
   Object.keys(PIG_PALS).forEach(function(c){SPR.pig[c]={};['idle','a','b','jump'].forEach(function(k){SPR.pig[c][k]=mk(padTop(PIG_TOP.concat(PIG_LEGS[k]),3),PIG_PALS[c],false)})});
   var ICON={};function pigIcon(c){if(ICON[c]!=null)return ICON[c];try{ICON[c]=SPR.pig[c].idle.toDataURL()}catch(e){ICON[c]=''}return ICON[c]}
   Object.keys(ENEMY).forEach(function(k){var d=ENEMY[k];SPR[k]={a:mk(d.body.concat(d.legs.a),d.pal,!d.human&&'#2a1d3a'),b:mk(d.body.concat(d.legs.b),d.pal,!d.human&&'#2a1d3a')}});
+  SPR.porc=mk(PORC,{w:'#ffffff',q:'#d8d0ec',d:'#6a6090',Q:'#9a93b4',k:'#3a2a5a',r:'#ff9cc2',e:'#140b26',f:'#ff6fa6'},'#2a1d3a');
+  SPR.trapD=mk(TRAP,{s:'#6f6890',t:'#a8a2c0',d:'#3a3352',D:'#4f4868'},false);
+  SPR.trapL=mk(TRAP,{s:'#e4e0f2',t:'#ffffff',d:'#8a84a8',D:'#c8c2dc'},false);
   SPR.o=mk(COOKIE,{l:'#ffd6ec',c:'#21c8e0',v:'#9a6ae8',p:'#ff4fa8'},'#7a2a6a');
   SPR.r=mk(ROLL,{w:'#ffffff',v:'#9a6ae8'},'#5a3a8a');
   SPR.p=mk(POP,{p:'#ff4fa8',P:'#d62d84',h:'#ffd6ec',c:'#3ff0ff',w:'#ffffff'},'#5a1d4a');
@@ -400,8 +409,9 @@ function mount(host,api){
     if(p.inv>0)p.inv--;
     p.anim+=Math.abs(p.vx)*.12;
     // hazards
-    var l=Math.floor((p.x+3)/T),r2=Math.floor((p.x+p.w-3)/T),t1=Math.floor((p.y+3)/T),b1=Math.floor((p.y+p.h-2)/T),c,r;
-    for(c=l;c<=r2;c++)for(r=t1;r<=b1;r++)if(tileAt(c,r)==='x'){hurt(c*T+8);break}
+    var pb={x:p.x+2,y:p.y+2,w:p.w-4,h:p.h-2},c0=Math.floor(p.x/T),c1=Math.floor((p.x+p.w)/T),r0=Math.floor(p.y/T),r1=Math.floor((p.y+p.h)/T),c,r,hit=false;
+    for(c=c0;c<=c1&&!hit;c++)for(r=r0;r<=r1;r++)if(tileAt(c,r)==='x'){var hh=HZH[lv.hz[c+','+r]]||10;
+      if(overlap(pb,{x:c*T+2,y:(r+1)*T-hh,w:12,h:hh})){hurt(c*T+8);hit=true;break}}
     // pit
     if(p.y>H+10)fall();
   }
@@ -495,6 +505,7 @@ function mount(host,api){
     for(r=0;r<ROWS;r++)for(c=c0;c<=c1&&c<lv.w;c++){t=lv.grid[r][c];if(t==='.')continue;
       if(t==='w'){img=A.t.w[(tick>>4)&1];if(r>0&&lv.grid[r-1][c]!=='w'){b.drawImage(img,c*T-cx,r*T+4,T,T-4)}else b.drawImage(img,c*T-cx,r*T)}
       else if(t==='G'&&r>0&&tileAt(c,r-1)==='G'){b.drawImage(A.t['#'],c*T-cx,r*T)}
+      else if(t==='x')drawHaz(c,r,c*T-cx,(r+1)*T);
       else{img=A.t[t];if(img)b.drawImage(img,c*T-cx,r*T)}}
     lv.chks.forEach(function(k){var x=k.x-cx;if(x<-20||x>W+20)return;R(b,'#d8d0ec',x,k.y-26,2,26);R(b,'#8a80b0',x-3,k.y-2,8,2);
       var bob=reduce?0:Math.sin(tick/20)*1.5,col=k.on?'#3ff0ff':'#ff4fa8';b.strokeStyle='#ffffff';b.lineWidth=.5;b.beginPath();b.moveTo(x+1,k.y-26);b.lineTo(x+1,k.y-30+bob);b.stroke();
@@ -507,6 +518,33 @@ function mount(host,api){
     if(th.night){b.fillStyle='rgba(20,8,50,.18)';b.fillRect(0,0,W,H)}
     // to screen
     ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;ctx.drawImage(buf,0,0,cv.width,cv.height)}
+  function drawHaz(c,r,x,base){
+    var k=lv.hz[c+','+r],ph;
+    if(k==='fence'){
+      var L=tileAt(c-1,r)==='x',Rt=tileAt(c+1,r)==='x';
+      ph=reduce?.5+.15*Math.sin(tick/90):.5+.5*Math.sin(tick/9+c);
+      var wire=ph>.6?'#ffffff':(ph>.3?'#3ff0ff':'#2fb8d0');
+      if(!L){R(b,'#6f6698',x+1,base-13,3,13);R(b,'#b8acd8',x+1,base-14,3,2)}
+      if(!Rt){R(b,'#6f6698',x+12,base-13,3,13);R(b,'#b8acd8',x+12,base-14,3,2)}
+      if(L&&Rt){R(b,'#6f6698',x+7,base-12,2,12)}
+      R(b,'#ff4fa8',L?x+6:x+2,base-8,2,2);    // insulators
+      R(b,wire,x+(L?0:3),base-11,16-(L?0:3)-(Rt?0:3),1);R(b,wire,x+(L?0:3),base-6,16-(L?0:3)-(Rt?0:3),1);
+      if(!reduce){var q=(tick+c*13)%30;if(q<8){var sx=x+((c*5+tick)%12)+2,sy=base-(q%2?11:6);R(b,'#ffffff',sx,sy-1,1,1);R(b,'#9dff4f',sx-1,sy-2,1,1);R(b,'#3ff0ff',sx+1,sy-3,1,1);if(q<3)R(b,'#9dff4f',sx+2,sy-1,1,1)}}
+      else if(ph>.6){R(b,'#e4fbff',x+7,base-12,1,1)}
+      // little warning plate
+      if(!L){R(b,'#ffffff',x,base-5,5,4);R(b,'#ff4fa8',x+2,base-5,1,2);R(b,'#ff4fa8',x+1,base-3,2,1)}
+    }else if(k==='porc'){
+      var img=SPR.porc,flip=c%2===1,bristle=!reduce&&((tick+c*17)%90<10),iw=img.width,ih=img.height,px=x+(16-iw)/2,py=base-ih;
+      b.save();if(flip){b.translate(px+iw,py);b.scale(-1,1)}else b.translate(px,py);
+      if(bristle){b.drawImage(img,0,0,iw,5,0,-1,iw,5);b.drawImage(img,0,5,iw,ih-5,0,5,iw,ih-5)}else b.drawImage(img,0,0);
+      b.restore();
+    }else{
+      ph=reduce?.5+.15*Math.sin(tick/120):.5+.45*Math.sin(tick/14+c);
+      b.fillStyle='rgba(255,79,168,'+(0.12+ph*(reduce?.12:.28)).toFixed(3)+')';b.beginPath();b.ellipse(x+8,base-2,9,3,0,0,7);b.fill();
+      b.drawImage(SPR.trapD,x,base-SPR.trapD.height);
+      b.globalAlpha=Math.max(0,Math.min(1,ph));b.drawImage(SPR.trapL,x,base-SPR.trapL.height);b.globalAlpha=1;
+    }
+  }
   function drawEnemy(e,x){
     var s=SPR[e.type],img=(Math.floor(e.anim)%2)?s.b:s.a,D=e.D;
     var iw=img.width,ih=img.height,dx=x+e.w/2-iw/2,dy=e.y+e.h-ih+(D.human?1:1);
