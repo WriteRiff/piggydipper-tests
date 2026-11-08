@@ -16,8 +16,14 @@ const LV=[
   {c:7,r:9,n:4,t:6,clump:.22},
   {c:8,r:10,n:5,t:7,clump:.28},
   {c:9,r:10,n:5,t:5,clump:.30},
-  {c:9,r:11,n:6,t:5,clump:.36}
+  {c:9,r:11,n:6,t:5,clump:.36},
+  {c:9,r:12,n:6,t:5,clump:.38},
+  {c:10,r:12,n:6,t:5,clump:.38},
+  {c:10,r:12,n:6,t:4,clump:.40},
+  {c:10,r:13,n:6,t:4,clump:.40},
+  {c:10,r:13,n:6,t:3,clump:.42}
 ];
+const MAXL=LV.length;
 
 /* ---------- board logic on plain arrays (columns, bottom-up) ---------- */
 function rawBoard(L,clump){
@@ -63,10 +69,11 @@ function solve(g,K){
 function genBoard(L){
   let clump=L.clump,best=null,bestLeft=1e9;const t0=performance.now();
   for(let a=0;a<80;a++){const g=rawBoard(L,clump);if(!hasMove(g))continue;
-    const left=solve(g,36);if(left<=L.t)return g;
+    const left=solve(g,36);if(left<=L.t){genBoard.left=left;return g}
     if(left<bestLeft){bestLeft=left;best=g}
     if(a%6===5)clump=Math.min(.62,clump+.04);
     if(performance.now()-t0>300)break}
+  genBoard.left=best?bestLeft:1e9;
   return best||rawBoard(L,.5)}
 
 /* ---------- treat drawing (smooth, glossy) ---------- */
@@ -138,7 +145,7 @@ function mount(host,api){
   const bUndo=$('[data-act="undo"]'),bRestart=$('[data-act="restart"]'),bPause=$('[data-act="pause"]');
 
   let best=parseInt(sget('pdg-pop-best'),10)||0;
-  let unlocked=Math.min(5,Math.max(1,parseInt(sget('pdg-pop-unlocked'),10)||1));
+  let unlocked=Math.min(MAXL,Math.max(1,parseInt(sget('pdg-pop-unlocked'),10)||1));let won=false;
   let lv=0,L=LV[0],cols=[],init=null,score=0,lvStart=0,undoSnap=null,undoLeft=1;
   let playing=false,paused=false,pendingEnd=false,dead=false;
   let cs=40,dpr=1,BW=0,BH=0,spr={};
@@ -149,7 +156,7 @@ function mount(host,api){
   const types=()=>cols.map(col=>col.map(o=>o.t));
   const left=()=>cols.reduce((s,col)=>s+col.length,0);
 
-  function hud(){elLv.textContent=(lv+1)+'/5';elSc.textContent=pad(score);const n=left();elLeft.textContent=n;elTgt.textContent='/'+L.t;
+  function hud(){elLv.textContent=(lv+1)+'/'+MAXL;elSc.textContent=pad(score);const n=left();elLeft.textContent=n;elTgt.textContent='/'+L.t;
     elGoal.classList.toggle('met',playing&&n<=L.t);
     bUndo.disabled=!playing||paused||!undoSnap||undoLeft<1;bRestart.disabled=!playing||paused;bPause.disabled=!playing||paused}
 
@@ -169,12 +176,12 @@ function mount(host,api){
   function hideOv(){ov.hidden=true;ov.innerHTML='';hud()}
   const btn=(act,txt,cls,extra)=>'<button type="button" class="pp-btn '+(cls||'')+'" data-act="'+act+'" '+(extra||'')+'>'+txt+'</button>';
   function menu(){playing=false;paused=false;pendingEnd=false;hl=null;
-    let lv5='';for(let i=0;i<5;i++)lv5+=btn('lv'+i,i<unlocked?String(i+1):'<span aria-hidden="true">✕</span>','lvl'+(i<unlocked?'':' locked'),(i<unlocked?'':'disabled ')+'aria-label="Level '+(i+1)+(i<unlocked?'':' locked')+'"');
+    let lv5='';for(let i=0;i<MAXL;i++)lv5+=btn('lv'+i,i<unlocked?String(i+1):'<span aria-hidden="true">✕</span>','lvl'+(i<unlocked?'':' locked'),(i<unlocked?'':'disabled ')+'aria-label="Level '+(i+1)+(i<unlocked?'':' locked')+'"');
     showOv('<h3 class="pp-t">Sweet Pop</h3><p class="pp-m">Tap 2 or more matching treats that touch to pop them. Leave only a few on the board to clear the level.</p>'+
       '<p class="pp-k">PICK A LEVEL</p><div class="pp-lvls">'+lv5+'</div><p class="pp-best">BEST '+pad(best)+'</p>')}
   function startLevel(i,keepScore){
-    lv=i;L=LV[i];if(!keepScore)score=0;lvStart=score;
-    init=genBoard(L);cols=toTiles(init,!reduce);undoSnap=null;undoLeft=1;dying=[];parts=[];floats=[];hl=null;kb=null;
+    lv=i;L=Object.assign({},LV[i]);if(!keepScore)score=0;lvStart=score;
+    init=genBoard(L);if(genBoard.left<1e9&&genBoard.left>L.t)L.t=genBoard.left;cols=toTiles(init,!reduce);undoSnap=null;undoLeft=1;dying=[];parts=[];floats=[];hl=null;kb=null;
     playing=true;paused=false;pendingEnd=false;hideOv();size();
     banner={t:0,a:'LEVEL '+(i+1),b:'LEAVE '+L.t+' OR FEWER'};kick();try{cv.focus({preventScroll:true})}catch(e){}}
   function restart(){if(!playing)return;score=lvStart;cols=toTiles(init,!reduce);undoSnap=null;undoLeft=1;dying=[];hl=null;pendingEnd=false;hideOv();
@@ -188,17 +195,17 @@ function mount(host,api){
     pendingEnd=false;const n=left();
     if(n<=L.t){
       const bonus=n===0?1000*(lv+1):(L.t-n+1)*50*(lv+1);score+=bonus;playing=false;
-      if(lv+2>unlocked&&lv<4){unlocked=lv+2;sset('pdg-pop-unlocked',unlocked)}
+      if(lv+2>unlocked&&lv<MAXL-1){unlocked=lv+2;sset('pdg-pop-unlocked',unlocked)}
       if(score>best){best=score;sset('pdg-pop-best',best)}
       const line=(n===0?'BOARD CLEARED!':n+' LEFT')+' · BONUS +'+bonus;
-      if(lv===4){
-        showOv('<h3 class="pp-t big">YOU BEAT SWEET POP!</h3><p class="pp-m">'+line+'</p><p class="pp-best">SCORE '+pad(score)+'</p><div class="pp-row">'+btn('lv0','PLAY AGAIN')+btn('menu','MENU','ghost')+'</div>');
-        try{api.win&&api.win('pop',score)}catch(e){}
-      }else showOv('<h3 class="pp-t">LEVEL '+(lv+1)+' CLEAR!</h3><p class="pp-m">'+line+'</p><p class="pp-best">SCORE '+pad(score)+'</p><div class="pp-row">'+btn('next','NEXT LEVEL')+btn('menu','MENU','ghost')+'</div>');
+      if(lv===4&&!won){won=true;try{api.win&&api.win('pop',score)}catch(e){}}
+      if(lv===MAXL-1){
+        showOv('<h3 class="pp-t big">YOU BEAT ALL 10!</h3><p class="pp-m">'+line+'</p><p class="pp-best">SCORE '+pad(score)+'</p><div class="pp-row">'+btn('lv0','PLAY AGAIN')+btn('menu','LEVELS','ghost')+'</div>');
+      }else showOv('<h3 class="pp-t">LEVEL '+(lv+1)+' CLEAR!</h3><p class="pp-m">'+line+'</p><p class="pp-best">SCORE '+pad(score)+'</p><div class="pp-row">'+btn('next','NEXT LEVEL')+btn('menu','LEVELS','ghost')+'</div>');
     }else{
       playing=false;
       showOv('<h3 class="pp-t">NO MOVES LEFT</h3><p class="pp-m">'+n+' left · needed '+L.t+' or fewer</p><div class="pp-row">'+
-        (undoSnap&&undoLeft>0?btn('undo2','UNDO LAST POP'):'')+btn('retry','TRY AGAIN',undoSnap&&undoLeft>0?'ghost':'')+btn('menu','MENU','ghost')+'</div>')}
+        (undoSnap&&undoLeft>0?btn('undo2','UNDO LAST POP'):'')+btn('retry','TRY AGAIN',undoSnap&&undoLeft>0?'ghost':'')+btn('menu','LEVELS','ghost')+'</div>')}
     hud()}
 
   /* ---------- popping ---------- */

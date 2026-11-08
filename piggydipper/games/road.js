@@ -68,8 +68,32 @@ const LEVELS = [
     PA(1,1.1), S(-1,1.6,[2,3],[1.5,2.4]), S(1,1.85,[2,3],[1.6,2.5]),
     'walk',
     R(-1,2,'van,truck',[2.5,3.6],{rush:true}), R(1,2.35,'scooter,bike',[2.3,3.2]), R(-1,1.8,'sweeper,van',[2.5,3.4],{rush:true}), R(1,2.55,'bike,scooter',[2.3,3]),
-    'start']}
+    'start']},
+  {name:'SUGAR RUSH', time:29, rows:['goal','walk',
+    S(1,1.9,[2,3],[1.7,2.6]), PA(-1,1.25), S(1,2,[2,3],[1.7,2.6]),
+    'walk',
+    R(-1,2.15,'van,truck',[2.4,3.4],{rush:true}), R(1,2.5,'scooter,bike',[2.2,3]), R(-1,2,'sweeper,truck',[2.4,3.2],{rush:true}), R(1,2.7,'bike,scooter',[2.2,2.9]),
+    'start']},
+  {name:'LATE SHIFT', time:28, rows:['goal','walk',
+    PA(1,1.35), S(-1,2.1,[2,3],[1.8,2.7]), S(1,2.2,[2,3],[1.8,2.7]),
+    'walk',
+    R(1,2.3,'van,truck',[2.4,3.3],{rush:true}), R(-1,2.7,'scooter,bike',[2.2,2.9]), R(1,2.2,'sweeper,van',[2.4,3.2],{rush:true}), R(-1,2.9,'bike,scooter',[2.2,2.8]),
+    'start']},
+  {name:'DOUBLE PARADE', time:27, rows:['goal','walk',
+    PA(1,1.45), PA(-1,1.55), S(1,2.3,[2,3],[1.9,2.8]),
+    'walk',
+    R(-1,2.45,'van,truck',[2.4,3.2],{rush:true}), R(1,2.85,'scooter,bike',[2.2,2.8]), R(-1,2.35,'sweeper,van',[2.4,3.1],{rush:true}), R(1,3,'bike,scooter',[2.2,2.7]),
+    'start']},
+  {name:'NO BREAKS', time:26, rows:['goal','walk',
+    PA(-1,1.6), S(1,2.4,[2,3],[2,2.9]), S(-1,2.5,[2,2],[2,2.9]),
+    R(1,2.6,'van,truck',[2.4,3.2],{rush:true}), R(-1,3,'scooter,bike',[2.2,2.8]), R(1,2.5,'sweeper,van',[2.4,3.1],{rush:true}), R(-1,3.1,'bike,scooter',[2.1,2.7]),
+    'walk','start']},
+  {name:'GRAND FINALE', time:25, rows:['goal','walk',
+    PA(1,1.75), S(-1,2.6,[2,3],[2.1,3]), S(1,2.7,[2,2],[2.1,3]),
+    R(-1,2.8,'van,truck',[2.4,3.1],{rush:true}), R(1,3.2,'scooter,bike',[2.2,2.7]), R(-1,2.7,'sweeper,truck',[2.4,3],{rush:true}), R(1,3.4,'bike,scooter',[2.1,2.6]),
+    'walk','start']}
 ];
+const MAXL = LEVELS.length;
 const SPOT_COLS = [1,5,9];
 const rnd = (a,b)=>a+Math.random()*(b-a);
 const mod = (a,n)=>((a%n)+n)%n;
@@ -114,7 +138,7 @@ window.PDGames.road = {
     host.classList.add('pdg', 'pdg-road');
     host.innerHTML =
       '<div class="rh-hud">' +
-        '<span class="rh-stat">LVL <b class="rh-lvl">1</b>/5</span>' +
+        '<span class="rh-stat">LVL <b class="rh-lvl">1</b>/10</span>' +
         '<span class="rh-stat">SCORE <b class="rh-score">00000</b></span>' +
         '<span class="rh-lives" aria-label="Lives"></span>' +
       '</div>' +
@@ -143,7 +167,7 @@ window.PDGames.road = {
     let picked = 1;
 
     const getNum = (k, d) => { const v = parseInt(store.get(k), 10); return isNaN(v) ? d : v; };
-    let unlocked = Math.min(5, Math.max(1, getNum('pdg-road-unlocked', 1)));
+    let unlocked = Math.min(MAXL, Math.max(1, getNum('pdg-road-unlocked', 1)));
     let best = Math.max(0, getNum('pdg-road-best', 0));
     picked = unlocked;
 
@@ -207,7 +231,7 @@ window.PDGames.road = {
     function hideOver(){ const had = host.contains(document.activeElement); over.hidden = true; over.innerHTML = ''; if(had){ try{ cv.focus({preventScroll:true}); }catch(e){} } }
     function levelPicker(){
       let h = '<div class="rh-levels" role="group" aria-label="Pick a level">';
-      for(let i=1;i<=5;i++){
+      for(let i=1;i<=MAXL;i++){
         const lock = i > unlocked;
         h += '<button type="button" class="rh-lv' + (i === picked ? ' sel' : '') + '" data-act="pick" data-n="' + i + '"' + (lock ? ' disabled aria-label="Level ' + i + ' locked"' : ' aria-label="Level ' + i + '"') + '>' + (lock ? '<span class="rh-lock" aria-hidden="true"></span>' : i) + '</button>';
       }
@@ -237,7 +261,7 @@ window.PDGames.road = {
       introT = setTimeout(go, 1700);
     }
     function introMsg(n){
-      return ['Watch the traffic','More lanes, faster cars','Ride the trays across the shake','Some lanes speed up','Mind the parade'][n-1];
+      return ['Watch the traffic','More lanes, faster cars','Ride the trays across the shake','Some lanes speed up','Mind the parade','Everything speeds up','Shorter trays, faster cars','Two parades','No sidewalk in the middle','The fastest street in town'][n-1];
     }
     function go(){
       clearTimeout(introT); introT = 0;
@@ -258,22 +282,23 @@ window.PDGames.road = {
       state = 'clear';
       const bonusPts = 250*level;
       score += bonusPts;
-      if(level < 5 && unlocked < level+1){ unlocked = level+1; store.set('pdg-road-unlocked', String(unlocked)); }
+      if(level < MAXL && unlocked < level+1){ unlocked = level+1; store.set('pdg-road-unlocked', String(unlocked)); }
       saveBest(); updHud();
-      if(level === 5){
-        if(!wonCalled){ wonCalled = true; try{ api.win && api.win('road', score); }catch(e){} }
+      if(level === 5 && !wonCalled){ wonCalled = true; try{ api.win && api.win('road', score); }catch(e){} }
+      if(level === MAXL){
         picked = 1;
-        showOver('<p class="rh-kicker">ALL 5 LEVELS CLEARED</p><p class="rh-title">YOU WIN!</p><p class="rh-msg">SCORE ' + String(score).padStart(5,'0') + '</p><button type="button" class="rh-go" data-act="again" data-focus>PLAY AGAIN</button><button type="button" class="rh-alt" data-act="menu">LEVELS</button>');
+        showOver('<p class="rh-kicker">ALL 10 LEVELS CLEARED</p><p class="rh-title rh-sm">YOU BEAT ALL 10!</p><p class="rh-msg">SCORE ' + String(score).padStart(5,'0') + '</p><button type="button" class="rh-go" data-act="again" data-focus>PLAY AGAIN</button><button type="button" class="rh-alt" data-act="menu">LEVELS</button>');
         burst(COLS*cell/2, ROWS*cell/2, 40, [C.pink,C.cyan,C.lime,C.vio,C.white]);
         return;
       }
+      if(level === 5) burst(COLS*cell/2, ROWS*cell/2, 30, [C.pink,C.cyan,C.lime,C.vio,C.white]);
       picked = level+1;
       showOver('<p class="rh-kicker">LEVEL ' + level + '</p><p class="rh-title rh-sm">CLEAR!</p><p class="rh-msg">BONUS +' + bonusPts + '</p><button type="button" class="rh-go" data-act="next" data-focus>NEXT LEVEL</button><button type="button" class="rh-alt" data-act="menu">LEVELS</button>');
     }
     function gameOver(){
       state = 'over'; saveBest(); updHud();
       picked = level;
-      showOver('<p class="rh-title rh-sm">GAME OVER</p><p class="rh-msg">SCORE ' + String(score).padStart(5,'0') + '</p><button type="button" class="rh-go" data-act="retry" data-focus>RETRY LEVEL ' + level + '</button><button type="button" class="rh-alt" data-act="menu">LEVELS</button>');
+      showOver('<p class="rh-title rh-sm">GAME OVER</p><p class="rh-msg">SCORE ' + String(score).padStart(5,'0') + '</p><button type="button" class="rh-go" data-act="retry" data-focus>TRY AGAIN</button><button type="button" class="rh-alt" data-act="menu">LEVELS</button>');
     }
     function saveBest(){ if(score > best){ best = score; store.set('pdg-road-best', String(best)); } }
 

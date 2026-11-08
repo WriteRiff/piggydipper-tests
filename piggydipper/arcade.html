@@ -15,7 +15,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Caveat:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,400;1,9..144,600&family=Ultra&family=Anton&family=Chewy&family=Tilt+Neon&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Lobster&family=Bebas+Neue&family=Shrikhand&family=Bowlby+One&family=Space+Grotesk:wght@400;500;700&family=Unbounded:wght@400;600;800&family=Manrope:ital,wght@0,400;0,600;0,800;1,400&family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Patrick+Hand&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter+Tight:wght@400;500;600;700&family=Press+Start+2P&family=VT323&family=Silkscreen:wght@400;700&display=swap">
-<script>document.documentElement.dataset.v='n5';(function(){function out(){var h=location.hash.slice(1);if(h&&h!=='home'&&h.indexOf('home-')!==0){location.replace('index.html#'+h);return true}return false}out();addEventListener('hashchange',out)})();</script>
+<script>document.documentElement.dataset.v='n5';document.documentElement.setAttribute('data-lockv','');(function(){var r=document.documentElement;
+function auto(){var h=new Date().getHours();return (h>=21||h<5)?'night':'day'}
+function pick(){var m=null;try{var o=JSON.parse(localStorage.getItem('pd-mode')||'null');if(o&&(o.m==='day'||o.m==='night')&&Date.now()-o.t<6*36e5)m=o.m}catch(e){}return m||auto()}
+function apply(m){if(!r.hasAttribute('data-lockv'))r.dataset.v=m==='night'?'4':'0';r.dataset.mode=m}
+window.__pdMode={auto:auto,pick:pick,apply:apply};apply(pick())})();
+(function(){function out(){var h=location.hash.slice(1);if(h&&h!=='home'&&h.indexOf('home-')!==0){location.replace('index.html#'+h);return true}return false}out();addEventListener('hashchange',out)})();</script>
 <style>
 [hidden]{display:none!important}
 html,body{margin:0}
@@ -2591,6 +2596,44 @@ html[data-v="n5"] .n5-dissolve.go i{animation:n5-cell 1ms steps(1) var(--d) both
 }
 
 #vswitch{display:none!important}
+/* ===== Piggy Dipper live site: day (Classic) and night (Neon Touch) ===== */
+/* night extras borrowed from Neon Night */
+html[data-v="4"] .h1-hero h2{font-family:"Tilt Neon",var(--f-hand);font-style:normal;color:var(--neon2);text-shadow:0 0 6px var(--neon2),0 0 22px rgba(143,240,255,.8)}
+html[data-v="4"] .page-hero h1{color:transparent;-webkit-text-stroke:1.6px var(--neon);text-shadow:0 0 18px rgba(255,92,154,.75)}
+@supports not (-webkit-text-stroke:1px red){html[data-v="4"] .page-hero h1{color:var(--neon)}}
+@media (prefers-reduced-motion:no-preference){html[data-v="4"] .page-hero h1{animation:vx-flicker 7s linear infinite}}
+/* smooth change between day and night */
+html.pd-fade body,html.pd-fade header.site,html.pd-fade footer.site,html.pd-fade .band,html.pd-fade .card{transition:background-color .6s,color .6s,border-color .6s}
+/* day / night switch */
+.mode-btn{flex:none;width:42px;height:42px;border-radius:50%;border:2px solid var(--fg);background:transparent;color:var(--fg);display:grid;place-items:center;cursor:pointer;padding:0}
+.mode-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mode-btn .moon{display:none}
+html[data-mode="night"] .mode-btn .sun{display:none}
+html[data-mode="night"] .mode-btn .moon{display:block}
+html[data-v="4"] .mode-btn{border-color:var(--neon);color:#fff;box-shadow:0 0 10px rgba(255,92,154,.45)}
+.mode-btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+@media (max-width:1020px){header.site .mode-btn{margin-left:.4rem}}
+/* pixel game button */
+.pd-play{display:inline-flex;flex-direction:column;align-items:flex-start;gap:6px;text-decoration:none;margin:0 0 1.1rem;padding:12px 16px 11px;background:#140b26;color:#ffd6ec;font-family:"Press Start 2P",monospace;image-rendering:pixelated;
+  box-shadow:0 -4px 0 0 #140b26,0 4px 0 0 #140b26,-4px 0 0 0 #140b26,4px 0 0 0 #140b26,0 0 0 4px #ff4fa8,6px 6px 0 4px #3ff0ff;transition:transform .12s steps(2)}
+.pd-play .t{font-size:13px;line-height:1.3;color:#fff;text-shadow:2px 2px 0 #ff4fa8}
+.pd-play .s{font-size:9px;line-height:1.4;color:#9dff4f;display:flex;align-items:center;gap:8px}
+.pd-play .s i{font-style:normal;animation:pd-blink 1s steps(2) infinite}
+.pd-play .px{display:flex;gap:3px;margin-bottom:2px}.pd-play .px b{width:6px;height:6px;background:#ff4fa8}.pd-play .px b:nth-child(2){background:#3ff0ff}.pd-play .px b:nth-child(3){background:#9dff4f}.pd-play .px b:nth-child(4){background:#b48cff}
+.pd-play:hover,.pd-play:focus-visible{transform:translate(-2px,-2px);outline:none;box-shadow:0 -4px 0 0 #140b26,0 4px 0 0 #140b26,-4px 0 0 0 #140b26,4px 0 0 0 #140b26,0 0 0 4px #ff4fa8,8px 8px 0 4px #3ff0ff}
+.pd-play:active{transform:translate(3px,3px);box-shadow:0 0 0 4px #ff4fa8,2px 2px 0 4px #3ff0ff}
+html[data-v="4"] .pd-play{box-shadow:0 0 0 4px #ff4fa8,6px 6px 0 4px #3ff0ff,0 0 28px 6px rgba(255,79,168,.45)}
+@keyframes pd-blink{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.pd-play .s i{animation:none}}
+@media (max-width:480px){
+  header.site .wrap{gap:.5rem}
+  header.site .brand{gap:.4rem;min-width:0}
+  header.site .brand img{width:42px;height:42px}
+  header.site .brand span{font-size:.92rem}
+  .mode-btn{width:38px;height:38px}
+  .menu-btn{padding:.4em .75em;font-size:.85rem}
+}
+@media (max-width:360px){header.site .brand>span{font-size:.8rem}}
 /* ===== Piggy Dipper arcade hub ===== */
 .pd-hub{position:relative;padding:calc(18px + .5rem) 0 2.5rem;background:radial-gradient(120% 70% at 50% 0,#2a1650 0,#140b26 55%,#0d0719 100%);color:#f4ecff;border-bottom:4px solid #ff4fa8}
 .pd-hub .wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
@@ -2615,17 +2658,65 @@ html[data-v="n5"] .n5-dissolve.go i{animation:n5-cell 1ms steps(1) var(--d) both
 .pd-coupon{position:relative;width:min(100%,380px);background:#fff7fb;color:#2a1650;text-align:center;padding:22px 18px 18px;border:4px dashed #ff4fa8;outline:6px solid #fff7fb;box-shadow:0 0 0 10px #3ff0ff,0 24px 60px rgba(0,0,0,.6);animation:pd-pop .45s cubic-bezier(.3,1.6,.5,1) both}
 @keyframes pd-pop{from{transform:scale(.6) rotate(-6deg);opacity:0}}
 .pd-x{all:unset;cursor:pointer;position:absolute;top:6px;right:10px;font:700 28px/1 system-ui;color:#2a1650;padding:4px 8px}
-.pd-c-won{font:11px/1.5 "Press Start 2P",monospace;color:#ff4fa8;margin:0 24px 8px}
-.pd-c-logo{width:92px;height:92px;display:block;margin:0 auto 6px}
-.pd-c-off{font:clamp(30px,10vw,42px)/1.1 "Press Start 2P",monospace;color:#2a1650;text-shadow:3px 3px 0 #3ff0ff;margin:4px 0 6px}
+.pd-c-won{font:13px/1.5 "Press Start 2P",monospace;color:#ff4fa8;margin:0 24px 8px}
+.pd-c-logo{width:72px;height:72px;display:block;margin:0 auto 6px}
+.pd-c-off{font:clamp(30px,10vw,42px)/1.1 "Press Start 2P",monospace;color:#2a1650;text-shadow:3px 3px 0 #3ff0ff;margin:4px 0 4px}
 .pd-c-from{font:600 15px/1.4 system-ui,sans-serif;margin:0 0 12px}
 .pd-c-code{font:15px/1 "Press Start 2P",monospace;letter-spacing:.06em;background:#2a1650;color:#9dff4f;padding:12px 8px;margin:0 0 10px;user-select:all;-webkit-user-select:all;word-break:break-all}
 .pd-c-exp{font:600 15px/1.4 system-ui,sans-serif;margin:0 0 10px}
 .pd-c-exp b{color:#e0237f}
 .pd-c-how{font:14px/1.45 system-ui,sans-serif;margin:0 0 8px}
 .pd-c-how a{color:#e0237f;font-weight:700}
-.pd-c-tip{font:9px/1.5 "Press Start 2P",monospace;color:#7d52d6;margin:0}
+.pd-c-sub{font:600 15px/1.4 system-ui,sans-serif;margin:0 6px 10px}
+.pd-c-cap{font:700 16px/1.3 system-ui,sans-serif;color:#e0237f;margin:0 0 4px}
+.pd-c-tip{font:11px/1.6 "Press Start 2P",monospace;color:#fff;background:#ff4fa8;padding:8px 6px;margin:4px 0 14px}
+.pd-c-go{all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%;font:12px/1.3 "Press Start 2P",monospace;color:#140b26;background:#9dff4f;padding:14px 10px;box-shadow:0 4px 0 #3c8a1e;text-align:center;min-height:48px}
+.pd-c-go:focus-visible{outline:3px solid #3ff0ff;outline-offset:3px}
+.pd-c-go:active{transform:translateY(3px);box-shadow:0 1px 0 #3c8a1e}
+.pd-c-more{font:13px/1.4 system-ui,sans-serif;color:#7d52d6;margin:10px 0 0}
 @media (prefers-reduced-motion:reduce){.pd-blink,.pd-coupon{animation:none}}
+/* ===== Arcade page: day mode uses the Classic day colors (follows the phone's light/dark setting like the main site) ===== */
+html[data-v="n5"][data-mode="day"]:root{
+  --bg:#fff6f3; --fg:#2a1d24; --muted:#8a6570; --surface:#fffdfc; --band:#fbdcd7; --line:rgba(42,29,36,.16);
+  --accent:#e8467c; --accent-fg:#fffaf5; --rose:#e8467c; --stick:#fbf3ee;
+  --pk:#e8467c; --cy:#c24c56; --li:#c24c56; --lv:#a0607a; --ink:#2a1d24; --deep:#fbdcd7; color-scheme:light;
+  --hb1:#fff6f3; --hb2:#fbdcd7; --hcab:#fffdfc; --hline:#e8467c; --hline2:#ef9a93; --htxt:#2a1d24; --hsub:#c24c56; --htab:#fff6f3; --htabtxt:#6b4a58;
+}
+@media (prefers-color-scheme:dark){html[data-v="n5"][data-mode="day"]:root{
+  --bg:#19141a; --fg:#fbeef0; --muted:#cfaab6; --surface:#241d25; --band:#3a2431; --line:rgba(251,238,240,.16);
+  --accent:#f4a2a6; --accent-fg:#1f1620; --rose:#f4a2a6; --pk:#f4a2a6; --cy:#f7c4c6; --li:#f7c4c6; --lv:#d7a6c0; --ink:#1f1620; --deep:#241d25; color-scheme:dark;
+  --hb1:#2d222c; --hb2:#19141a; --hcab:#241d25; --hline:#f4a2a6; --hline2:#c24c56; --htxt:#fbeef0; --hsub:#f7c4c6; --htab:#19141a; --htabtxt:#fbeef0;
+}}
+html[data-v="n5"][data-mode="day"] body{background:var(--bg)}
+html[data-v="n5"][data-mode="day"] body::after{display:none}
+html[data-v="n5"][data-mode="day"] header.site,html[data-v="n5"][data-mode="day"] nav.main{background:var(--surface);box-shadow:0 4px 0 0 var(--hline),0 6px 0 0 var(--hline2)}
+html[data-v="n5"][data-mode="day"] .brand span{color:var(--fg)}
+html[data-v="n5"][data-mode="day"] .menu-btn{color:var(--accent-fg);background:var(--accent);box-shadow:0 -3px 0 0 var(--accent),0 3px 0 0 var(--accent),-3px 0 0 0 var(--accent),3px 0 0 0 var(--accent)}
+html[data-v="n5"][data-mode="day"] .h1-hero,html[data-v="n5"][data-mode="day"] .strip,html[data-v="n5"][data-mode="day"] .dict-hero,html[data-v="n5"][data-mode="day"] .vx-bake,html[data-v="n5"][data-mode="day"] .price-card.hot,html[data-v="n5"][data-mode="day"] footer.site{background:var(--band);color:var(--fg)}
+html[data-v="n5"][data-mode="day"] .h1-hero::after,html[data-v="n5"][data-mode="day"] .badge-wrap::before{opacity:.25}
+html[data-v="n5"][data-mode="day"] .n5-sky{opacity:.35}
+html[data-v="n5"][data-mode="day"] .h1-hero h1,html[data-v="n5"][data-mode="day"] .page-hero h1{color:var(--fg);text-shadow:3px 3px 0 var(--hline2)}
+html[data-v="n5"][data-mode="day"] .h1-hero .dict,html[data-v="n5"][data-mode="day"] .dict-hero *{color:var(--fg)}
+html[data-v="n5"][data-mode="day"] .vx-card .t,html[data-v="n5"][data-mode="day"] .tile span{color:#fff}
+html[data-v="n5"][data-mode="day"] .mode-btn{border-color:var(--fg);color:var(--fg)}
+html[data-v="n5"][data-mode="night"] .mode-btn{border-color:#3ff0ff;color:#3ff0ff;border-radius:0;box-shadow:3px 3px 0 #ff4fa8}
+/* hub */
+html[data-mode="day"] .pd-hub{background:linear-gradient(180deg,var(--hb2) 0,var(--hb1) 70%);color:var(--htxt);border-bottom-color:var(--hline)}
+html[data-mode="day"] .pd-back{color:var(--hsub);background:var(--hcab);box-shadow:0 0 0 3px var(--hsub),4px 4px 0 3px var(--hline2)}
+html[data-mode="day"] .pd-back:hover,html[data-mode="day"] .pd-back:focus-visible{background:var(--hsub);color:var(--hcab)}
+html[data-mode="day"] .pd-cab{background:var(--hcab);box-shadow:0 0 0 4px var(--hline2),0 0 0 8px var(--hcab),0 0 0 12px var(--hline),0 20px 44px -16px rgba(194,76,86,.45)}
+html[data-mode="day"] .pd-cab-title{color:var(--htxt);text-shadow:3px 3px 0 var(--hline2)}
+html[data-mode="day"] .pd-cab-sub{color:var(--hsub)}
+html[data-mode="day"] .pd-tabs button{color:var(--htabtxt);background:var(--htab);box-shadow:inset 0 0 0 2px var(--hline2)}
+html[data-mode="day"] .pd-tabs button[aria-selected="true"]{background:var(--hline);color:#fff;box-shadow:inset 0 0 0 2px var(--hline),0 4px 12px rgba(232,70,124,.35)}
+html[data-mode="day"] .pd-mycoupon{color:#fff;background:var(--hline);box-shadow:4px 4px 0 var(--hline2)}
+/* the main site's arcade button in day mode */
+html[data-v="0"] .pd-play{background:var(--surface);color:var(--fg);box-shadow:0 -4px 0 0 var(--surface),0 4px 0 0 var(--surface),-4px 0 0 0 var(--surface),4px 0 0 0 var(--surface),0 0 0 4px #e8467c,6px 6px 0 4px #ef9a93}
+html[data-v="0"] .pd-play .t{color:var(--fg);text-shadow:2px 2px 0 #f4a2a6}
+html[data-v="0"] .pd-play .s{color:var(--accent)}
+html[data-v="0"] .pd-play .px b{background:#e8467c}html[data-v="0"] .pd-play .px b:nth-child(2){background:#ef9a93}html[data-v="0"] .pd-play .px b:nth-child(3){background:#c24c56}html[data-v="0"] .pd-play .px b:nth-child(4){background:#f4a2a6}
+html[data-v="0"] .pd-play:hover,html[data-v="0"] .pd-play:focus-visible{box-shadow:0 -4px 0 0 var(--surface),0 4px 0 0 var(--surface),-4px 0 0 0 var(--surface),4px 0 0 0 var(--surface),0 0 0 4px #e8467c,8px 8px 0 4px #ef9a93}
+html[data-v="0"] .pd-play:active{box-shadow:0 0 0 4px #e8467c,2px 2px 0 4px #ef9a93}
 
 </style>
 </head>
@@ -2638,6 +2729,7 @@ html[data-v="n5"] .n5-dissolve.go i{animation:n5-cell 1ms steps(1) var(--d) both
       <a href="#home">Home</a><a href="#price">Price</a><a href="#cake-pops">Cake Pops</a><a href="#bakehouse">Bakehouse Specialties</a><a href="#order">Order</a><a href="#contact">Contact</a><a href="#about">About</a><a href="#gallery">Gallery</a>
     </nav>
     <a class="phone" href="tel:5012760212">1 (501) 276-0212</a>
+    <button class="mode-btn" id="modeBtn" type="button" aria-label="Switch to night mode"><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></svg></button>
   </div>
 </header>
 
@@ -2659,14 +2751,18 @@ html[data-v="n5"] .n5-dissolve.go i{animation:n5-cell 1ms steps(1) var(--d) both
   <div class="pd-prize" id="pdPrize" hidden role="dialog" aria-modal="true" aria-labelledby="pdPrizeT">
     <div class="pd-coupon" id="pdCoupon">
       <button type="button" class="pd-x" id="pdPrizeX" aria-label="Close">×</button>
-      <p class="pd-c-won" id="pdPrizeT">YOU BEAT <span id="pdCGame">THE GAME</span>!</p>
+      <p class="pd-c-won" id="pdPrizeT">CONGRATULATIONS!</p>
+      <p class="pd-c-sub">You beat level 5 of <span id="pdCGame">the game</span> and won a coupon.</p>
       <img class="pd-c-logo" src="img/logo.png" alt="Piggy Dipper">
       <p class="pd-c-off">10% OFF</p>
+      <p class="pd-c-cap">up to $20 off</p>
       <p class="pd-c-from">A coupon from Piggy Dipper</p>
       <p class="pd-c-code" id="pdCCode">PD10-0000-XXXX</p>
       <p class="pd-c-exp">Expires <b id="pdCExp"></b></p>
       <p class="pd-c-how">Call or Text <a href="tel:5012760212">(501) 276-0212</a> to place an order, and mention this code.</p>
-      <p class="pd-c-tip">Screenshot this coupon to keep it.</p>
+      <p class="pd-c-tip">Don't forget to screenshot it!</p>
+      <button type="button" class="pd-c-go" id="pdPrizeGo">CONTINUE PLAYING ▶</button>
+      <p class="pd-c-more">Keep going and see how far you can get. There are 10 levels.</p>
     </div>
   </div>
 </section>
@@ -4581,10 +4677,10 @@ addEventListener('hashchange',route); route();
   function valid(c){return c&&c.exp&&c.exp>Date.now()}
   function show(c){
     const d=new Date(c.exp);
-    $('#pdCGame').textContent=(G[c.game]&&G[c.game].title||'THE GAME').toUpperCase();
+    $('#pdCGame').textContent=(G[c.game]&&G[c.game].title)||'the game';
     $('#pdCCode').textContent=c.code;
     $('#pdCExp').textContent=DAY[d.getDay()]+', '+MON[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();
-    prize.hidden=false;try{$('#pdPrizeX').focus({preventScroll:true})}catch(e){}}
+    prize.hidden=false;try{$('#pdPrizeGo').focus({preventScroll:true})}catch(e){}}
   function award(id){
     const old=load();
     let c=old;
@@ -4596,11 +4692,23 @@ addEventListener('hashchange',route); route();
   function refreshMy(){myBtn.hidden=!valid(load())}
   myBtn.addEventListener('click',()=>{const c=load();if(valid(c))show(c);else refreshMy()});
   function close(){prize.hidden=true;try{myBtn.hidden||myBtn.focus({preventScroll:true})}catch(e){}}
-  $('#pdPrizeX').addEventListener('click',close);
+  $('#pdPrizeX').addEventListener('click',close);$('#pdPrizeGo').addEventListener('click',close);
   prize.addEventListener('click',e=>{if(e.target===prize)close()});
   addEventListener('keydown',e=>{if(e.key==='Escape'&&!prize.hidden)close()});
   refreshMy();
   window.__pdAward=award;
+})();
+
+</script>
+<script>
+/* ---------- day / night ---------- */
+(function(){
+  const M=window.__pdMode,btn=document.getElementById('modeBtn'),root=document.documentElement;if(!M||!btn)return;
+  function label(){const night=root.dataset.mode==='night';btn.setAttribute('aria-label',night?'Switch to day mode':'Switch to night mode');btn.title=night?'Day mode':'Night mode'}
+  function set(m){root.classList.add('pd-fade');M.apply(m);label();setTimeout(()=>root.classList.remove('pd-fade'),700)}
+  btn.addEventListener('click',()=>{const m=root.dataset.mode==='night'?'day':'night';try{localStorage.setItem('pd-mode',JSON.stringify({m,t:Date.now()}))}catch(e){}set(m)});
+  setInterval(()=>{const m=M.pick();if(m!==root.dataset.mode)set(m)},60000);
+  label();
 })();
 
 </script>

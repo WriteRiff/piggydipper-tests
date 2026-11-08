@@ -4,9 +4,17 @@ window.PDGames = window.PDGames || {};
 
 /* ===== Treat Stack: falling bakery pieces on a cooling rack ===== */
 const COLS = 10, ROWS = 16;
-const TARGETS = [6, 8, 10, 12, 14];
-const SPEED = [0.80, 0.62, 0.48, 0.36, 0.26];
-const JUNK = [0, 0, 0, 2, 4];
+/* 10 levels: rows to clear, seconds per row, leftover rows at the start */
+const NLV = 10;
+const TARGETS = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+const SPEED = [1.00, 0.80, 0.68, 0.58, 0.50, 0.43, 0.37, 0.32, 0.28, 0.25];
+const JUNK = [0, 0, 0, 0, 0, 0, 1, 2, 2, 3];
+
+/* Look of the L-shaped piece and its mirror. 0 = piping bag (now).
+   1 = candy cane, 2 = cake pop & cookie, 3 = cookie stack, 4 = dipping spoon, 5 = mini rolls.
+   Change this one number to swap the look. */
+const L_STYLE = 0;
+const L_NAMES = ['Piping bag', 'Candy cane', 'Cake pop & cookie', 'Cookie stack', 'Dipping spoon', 'Mini rolls'];
 const LINE_PTS = [0, 100, 300, 500, 800];
 
 /* cake pop coatings: base, highlight/drizzle, shade */
@@ -25,8 +33,9 @@ const SHAPES = {
   roll:    { cells: [[0,0],[1,0],[0,1],[1,1]], w: 2, h: 2, wt: 1, still: true },
   cookie:  { cells: [[0,0]],                   w: 1, h: 1, wt: .55, still: true },
   pig:     { cells: [[0,0],[1,0],[2,0],[1,1]], w: 3, h: 2, wt: 1 },
-  bagL:    { cells: [[0,0],[0,1],[0,2],[1,2]], w: 2, h: 3, wt: .9 },
-  bagJ:    { cells: [[1,0],[1,1],[1,2],[0,2]], w: 2, h: 3, wt: .9 },
+  /* the L and its mirror are one rarer family: about half a normal piece between them */
+  bagL:    { cells: [[0,0],[0,1],[0,2],[1,2]], w: 2, h: 3, wt: .28 },
+  bagJ:    { cells: [[1,0],[1,1],[1,2],[0,2]], w: 2, h: 3, wt: .28 },
   twistS:  { cells: [[1,0],[2,0],[0,1],[1,1]], w: 3, h: 2, wt: .9 },
   twistZ:  { cells: [[0,0],[1,0],[1,1],[2,1]], w: 3, h: 2, wt: .9 }
 };
@@ -47,7 +56,7 @@ function memb(t, cx, cy) { return SHAPES[t].cells.some(c => c[0] === cx && c[1] 
 const inE = (x, y, cx, cy, rx, ry) => ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1;
 
 /* colour of one art pixel, in the piece's unrotated frame (8 units per cell) */
-function art(t, U, V, pal) {
+function art(t, U, V, pal, ls) {
   const x = U + .5, y = V + .5;
   switch (t) {
     case 'pretzel': {
@@ -102,7 +111,94 @@ function art(t, U, V, pal) {
       return null;
     }
     case 'bagL': case 'bagJ': {
-      const xx = t === 'bagJ' ? 16 - x : x, UU = t === 'bagJ' ? 15 - U : U;
+      /* draw in the L frame (16 x 24 art pixels); the J is the L mirrored */
+      const UU = t === 'bagJ' ? 15 - U : U;
+      return lArt(ls == null ? L_STYLE : ls, UU, V, pal);
+    }
+    case 'twistS': case 'twistZ': {
+      const cx = U >> 3, cy = V >> 3, lx = U & 7, ly = V & 7;
+      if (lx === 0 && !memb(t, cx - 1, cy)) return null;
+      if (lx === 7 && !memb(t, cx + 1, cy)) return null;
+      if (ly === 0 && !memb(t, cx, cy - 1)) return null;
+      if (ly === 7 && !memb(t, cx, cy + 1)) return null;
+      const main = t === 'twistS' ? '#9dff4f' : '#3ff0ff';
+      const dark = t === 'twistS' ? '#4fae2a' : '#1fa8c4';
+      const edge = (lx === 1 && !memb(t, cx - 1, cy)) || (lx === 6 && !memb(t, cx + 1, cy)) ||
+                   (ly === 1 && !memb(t, cx, cy - 1)) || (ly === 6 && !memb(t, cx, cy + 1));
+      if (edge) return dark;
+      if (hash(U, V, t === 'twistS' ? 5 : 9) < .07) return '#ff4fa8';
+      return ((U + V) % 6 < 3) ? main : '#ffffff';
+    }
+  }
+  return null;
+}
+
+/* colour of one art pixel of the L piece, in the L's own frame:
+   column 0 (U 0-7) runs down three cells (V 0-23), the foot is U 8-15, V 16-23 */
+function lArt(style, UU, V, pal) {
+  const U = UU, x = UU + .5, y = V + .5;
+  switch (style) {
+    case 1: { /* candy cane: pink and white stripes, bending into the foot */
+      /* centre line: down x=4 to y=16, quarter turn of radius 4 round (8,16)... then along y=20 to x=14, hooked up at the end */
+      let d;
+      if (y <= 16) d = Math.abs(x - 4);
+      else if (x <= 8) d = Math.abs(Math.hypot(x - 8, y - 16) - 4);
+      else if (x <= 12.5) d = Math.abs(y - 20);
+      else d = Math.abs(Math.hypot(x - 12.5, y - 17) - 3);
+      if (x > 12.5 && y < 17) return null;
+      if (d > 2.6) return null;
+      if (d > 2.0) return '#c2307f';
+      const k = Math.floor((x + y) / 2.6) % 2;
+      if (d < .7 && x < 6 && y < 14) return '#ffffff';
+      return k ? '#ff4fa8' : '#ffffff';
+    }
+    case 2: { /* tall cake pop (head over 2 cells, stick in the 3rd) with a cookie at its foot */
+      if (U < 8) {
+        const c = POPC[pal % 4];
+        if (inE(x, y, 4, 8, 3.95, 7.7)) {
+          if (inE(x, y, 2.6, 4.6, 1.1, 2.1)) return c[1];
+          if (Math.abs(y - (9.2 + Math.sin(x * 1.4) * 1.1)) < .62) return c[1];
+          const dd = ((x - 4) / 3.95) ** 2 + ((y - 8) / 7.7) ** 2;
+          if (dd > .62 && x > 4.4 && y > 7) return c[2];
+          if (hash(U, V, pal + 11) < .07) { const sp = SPRINK[(hash(V, U, pal) * 5) | 0]; if (sp !== c[0]) return sp; }
+          return c[0];
+        }
+        if (V >= 15 && V < 23 && (U === 3 || U === 4)) return U === 3 ? '#f4ecff' : '#c9b8e8';
+        return null;
+      }
+      const k = COOKIE.map[V - 16] && COOKIE.map[V - 16][U - 8];
+      return k && k !== '.' ? COOKIE.pal[k] : null;
+    }
+    case 3: { /* four cookies: three stacked and one beside */
+      const lx = U & 7, ly = V & 7, cx = U >> 3, cy = V >> 3;
+      const k = COOKIE.map[ly] && COOKIE.map[ly][(cx + cy) % 2 ? 7 - lx : lx];
+      return k && k !== '.' ? COOKIE.pal[k] : null;
+    }
+    case 4: { /* dipping spoon: violet handle down, bowl of pink candy coating in the foot */
+      if (inE(x, y, 11.4, 20.2, 4.2, 3.3)) {
+        if (y < 19.2 && inE(x, y, 11.4, 20.2, 3.3, 2.5)) return y < 18.1 ? '#ffd6ec' : '#ff4fa8';
+        if (inE(x, y, 11.4, 20.2, 3.3, 2.5)) return '#ff4fa8';
+        return y < 20 ? '#efe3ff' : '#b9a8e8';
+      }
+      if (y < 13 && Math.abs(x - 4) < 2.1) { if (y < 1) return null; return Math.abs(x - 4) > 1.3 ? '#7d52d6' : '#b48cff'; }
+      /* metal neck curving from the handle into the bowl */
+      if (y >= 13 && y <= 20 && x < 8.5) { const dd = Math.abs(Math.hypot(x - 9, y - 13) - 5); if (dd < 1.5 && x < 9) return dd < .6 ? '#ffffff' : '#c9b8e8'; }
+      if (y >= 17.6 && y <= 19.6 && x >= 8 && x < 8.6) return '#c9b8e8';
+      if (V === 23 && U >= 8 && U <= 14 && hash(U, V, 4) < .5) return '#ff4fa8';
+      return null;
+    }
+    case 5: { /* four mini cinnamon rolls */
+      const lx = (U & 7) + .5, ly = (V & 7) + .5;
+      const r = Math.hypot(lx - 4, ly - 4);
+      if (r > 3.9) return null;
+      if (r > 3.25) return '#7d52d6';
+      if (r < .8) return '#ffffff';
+      const a = Math.atan2(ly - 4, lx - 4) / (Math.PI * 2) + 1;
+      const sp = (r + a * 1.6) % 1.6;
+      return sp < .8 ? '#ffffff' : '#b48cff';
+    }
+    default: { /* 0: piping bag with a frosting swirl */
+      const xx = x;
       if (UU < 8) {
         if (y < 2.6) { if (Math.abs(xx - 4) < 3.4) return V === 2 ? '#b48cff' : '#ffffff'; return null; }
         if (y < 19.2) {
@@ -125,22 +221,7 @@ function art(t, U, V, pal) {
       }
       return null;
     }
-    case 'twistS': case 'twistZ': {
-      const cx = U >> 3, cy = V >> 3, lx = U & 7, ly = V & 7;
-      if (lx === 0 && !memb(t, cx - 1, cy)) return null;
-      if (lx === 7 && !memb(t, cx + 1, cy)) return null;
-      if (ly === 0 && !memb(t, cx, cy - 1)) return null;
-      if (ly === 7 && !memb(t, cx, cy + 1)) return null;
-      const main = t === 'twistS' ? '#9dff4f' : '#3ff0ff';
-      const dark = t === 'twistS' ? '#4fae2a' : '#1fa8c4';
-      const edge = (lx === 1 && !memb(t, cx - 1, cy)) || (lx === 6 && !memb(t, cx + 1, cy)) ||
-                   (ly === 1 && !memb(t, cx, cy - 1)) || (ly === 6 && !memb(t, cx, cy + 1));
-      if (edge) return dark;
-      if (hash(U, V, t === 'twistS' ? 5 : 9) < .07) return '#ff4fa8';
-      return ((U + V) % 6 < 3) ? main : '#ffffff';
-    }
   }
-  return null;
 }
 
 /* rotate a canonical cell r quarter-turns clockwise */
@@ -155,6 +236,7 @@ function rotCell(cx, cy, w, h, r) {
 
 window.PDGames.stack = {
   id: 'stack',
+  _lArt: lArt, _lNames: L_NAMES,
   title: 'Treat Stack',
   blurb: 'Stack the treats. Fill a row to clear it.',
   mount(host, api) {
@@ -201,7 +283,7 @@ window.PDGames.stack = {
     let u = 3, cell = 24, su = 2, F = 6, boardX = 0, boardY = 0, sideX = 0, cw = 0, ch = 0;
     let state = 'menu', prevState = null;
     let level = 0, rowsDone = 0, score = 0, levelStartScore = 0, best = parseInt(store.get('pdg-stack-best'), 10) || 0;
-    let unlocked = Math.min(5, Math.max(1, parseInt(store.get('pdg-stack-unlocked'), 10) || 1));
+    let unlocked = Math.min(NLV, Math.max(1, parseInt(store.get('pdg-stack-unlocked'), 10) || 1));
     let grid = [], piece = null, next = null, uidN = 1, hist = [];
     let acc = 0, lockT = 0, lockMoves = 0, soft = false, clearRows = [], clearT = 0, introT = 0;
     let parts = [], raf = 0, last = 0, boardDirty = true, won = false, destroyed = false;
@@ -320,7 +402,7 @@ window.PDGames.stack = {
       if (fresh) score = 0;
       levelStartScore = score;
       emptyGrid(); addJunk(JUNK[l]); parts = []; clearRows = [];
-      piece = null; next = newPiece(); boardDirty = true; won = false;
+      piece = null; next = newPiece(); boardDirty = true;
       hudUp();
       state = 'intro'; introT = 1.2;
       showOv([['t', 'LEVEL ' + (l + 1)], ['m', 'CLEAR ' + TARGETS[l] + ' ROWS'], ['h', 'TAP TO GO']], [], true);
@@ -329,14 +411,14 @@ window.PDGames.stack = {
     function play() { hideOv(); state = 'play'; spawn(); last = performance.now(); kick(); try { cv.focus({ preventScroll: true }); } catch (e) {} }
     function levelClear() {
       state = 'levelclear'; piece = null;
-      if (level >= 4) {
+      if (level >= NLV - 1) {
         state = 'won';
-        unlocked = 5; store.set('pdg-stack-unlocked', '5');
-        showOv([['t', 'YOU BEAT IT!'], ['m', 'ALL 5 LEVELS'], ['m', 'SCORE ' + score]], [['PLAY AGAIN', () => startLevel(0, true)], ['LEVELS', menu]]);
-        if (!won) { won = true; try { api.win && api.win('stack', score); } catch (e) {} }
+        showOv([['t', 'YOU BEAT ALL 10!'], ['m', 'SCORE ' + score], ['m', 'BEST ' + best]], [['PLAY AGAIN', () => startLevel(0, true)], ['LEVELS', menu]]);
         return;
       }
       if (unlocked < level + 2) { unlocked = level + 2; store.set('pdg-stack-unlocked', String(unlocked)); }
+      /* level 5 earns the prize once per visit; the hub shows it on top of this screen */
+      if (level === 4 && !won) { won = true; try { api.win && api.win('stack', score); } catch (e) {} }
       showOv([['t', 'LEVEL ' + (level + 1) + ' CLEAR!'], ['m', 'SCORE ' + score]], [['NEXT LEVEL', () => startLevel(level + 1, false)], ['LEVELS', menu]]);
     }
     function gameOver() {
@@ -353,7 +435,7 @@ window.PDGames.stack = {
       state = 'menu'; piece = null; stopRepeat();
       emptyGrid(); boardDirty = true;
       const lv = el('div', 'pdg-stack-levels');
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < NLV; i++) {
         const b = el('button', 'pdg-stack-lv', String(i + 1)); b.type = 'button';
         if (i >= unlocked) { b.disabled = true; b.setAttribute('aria-label', 'Level ' + (i + 1) + ' locked'); }
         else { b.setAttribute('aria-label', 'Start level ' + (i + 1)); b.addEventListener('click', () => startLevel(i, true)); }

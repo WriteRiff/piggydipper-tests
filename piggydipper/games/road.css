@@ -26,8 +26,8 @@
 .pdg-road .rh-msg{font-size:22px;line-height:1.1;color:var(--rh-lp)}
 .pdg-road .rh-best{font-family:"Press Start 2P",monospace;font-size:10px;color:var(--rh-lime)}
 .pdg-road .rh-hint{font-family:"Silkscreen","Press Start 2P",monospace;font-size:11px;color:var(--rh-vio);letter-spacing:.04em}
-.pdg-road .rh-levels{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
-.pdg-road .rh-lv{all:unset;box-sizing:border-box;width:40px;height:40px;display:grid;place-items:center;cursor:pointer;font-family:"Press Start 2P",monospace;font-size:13px;color:#fff;
+.pdg-road .rh-levels{display:grid;grid-template-columns:repeat(5,38px);gap:6px;justify-content:center}
+.pdg-road .rh-lv{all:unset;box-sizing:border-box;width:38px;height:36px;display:grid;place-items:center;cursor:pointer;font-family:"Press Start 2P",monospace;font-size:11px;color:#fff;
   background:var(--rh-bg3);border:3px solid var(--rh-vio);box-shadow:3px 3px 0 var(--rh-bg4)}
 .pdg-road .rh-lv.sel{background:var(--rh-pink);border-color:#fff;color:var(--rh-bg)}
 .pdg-road .rh-lv:disabled{cursor:not-allowed;opacity:.45;border-color:var(--rh-bg4)}
@@ -58,3 +58,5 @@
   .pdg-road .rh-timebar.low i{animation:none}
   .pdg-road .rh-timebar i{transition:none}
 }
+
+.pdg-road .rh-over:has(.rh-levels){gap:8px}

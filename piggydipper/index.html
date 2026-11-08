@@ -14,7 +14,7 @@
 <script>(function(){var r=document.documentElement;
 function auto(){var h=new Date().getHours();return (h>=21||h<5)?'night':'day'}
 function pick(){var m=null;try{var o=JSON.parse(localStorage.getItem('pd-mode')||'null');if(o&&(o.m==='day'||o.m==='night')&&Date.now()-o.t<6*36e5)m=o.m}catch(e){}return m||auto()}
-function apply(m){r.dataset.v=m==='night'?'4':'0';r.dataset.mode=m}
+function apply(m){if(!r.hasAttribute('data-lockv'))r.dataset.v=m==='night'?'4':'0';r.dataset.mode=m}
 window.__pdMode={auto:auto,pick:pick,apply:apply};apply(pick())})();
 </script>
 <style>
@@ -1207,8 +1207,8 @@ html.pd-fade body,html.pd-fade header.site,html.pd-fade footer.site,html.pd-fade
 .mode-btn{flex:none;width:42px;height:42px;border-radius:50%;border:2px solid var(--fg);background:transparent;color:var(--fg);display:grid;place-items:center;cursor:pointer;padding:0}
 .mode-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .mode-btn .moon{display:none}
-html[data-v="4"] .mode-btn .sun{display:none}
-html[data-v="4"] .mode-btn .moon{display:block}
+html[data-mode="night"] .mode-btn .sun{display:none}
+html[data-mode="night"] .mode-btn .moon{display:block}
 html[data-v="4"] .mode-btn{border-color:var(--neon);color:#fff;box-shadow:0 0 10px rgba(255,92,154,.45)}
 .mode-btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 @media (max-width:1020px){header.site .mode-btn{margin-left:.4rem}}
@@ -1233,6 +1233,48 @@ html[data-v="4"] .pd-play{box-shadow:0 0 0 4px #ff4fa8,6px 6px 0 4px #3ff0ff,0 0
   .menu-btn{padding:.4em .75em;font-size:.85rem}
 }
 @media (max-width:360px){header.site .brand>span{font-size:.8rem}}
+/* ===== Arcade page: day mode uses the Classic day colors (follows the phone's light/dark setting like the main site) ===== */
+html[data-v="n5"][data-mode="day"]:root{
+  --bg:#fff6f3; --fg:#2a1d24; --muted:#8a6570; --surface:#fffdfc; --band:#fbdcd7; --line:rgba(42,29,36,.16);
+  --accent:#e8467c; --accent-fg:#fffaf5; --rose:#e8467c; --stick:#fbf3ee;
+  --pk:#e8467c; --cy:#c24c56; --li:#c24c56; --lv:#a0607a; --ink:#2a1d24; --deep:#fbdcd7; color-scheme:light;
+  --hb1:#fff6f3; --hb2:#fbdcd7; --hcab:#fffdfc; --hline:#e8467c; --hline2:#ef9a93; --htxt:#2a1d24; --hsub:#c24c56; --htab:#fff6f3; --htabtxt:#6b4a58;
+}
+@media (prefers-color-scheme:dark){html[data-v="n5"][data-mode="day"]:root{
+  --bg:#19141a; --fg:#fbeef0; --muted:#cfaab6; --surface:#241d25; --band:#3a2431; --line:rgba(251,238,240,.16);
+  --accent:#f4a2a6; --accent-fg:#1f1620; --rose:#f4a2a6; --pk:#f4a2a6; --cy:#f7c4c6; --li:#f7c4c6; --lv:#d7a6c0; --ink:#1f1620; --deep:#241d25; color-scheme:dark;
+  --hb1:#2d222c; --hb2:#19141a; --hcab:#241d25; --hline:#f4a2a6; --hline2:#c24c56; --htxt:#fbeef0; --hsub:#f7c4c6; --htab:#19141a; --htabtxt:#fbeef0;
+}}
+html[data-v="n5"][data-mode="day"] body{background:var(--bg)}
+html[data-v="n5"][data-mode="day"] body::after{display:none}
+html[data-v="n5"][data-mode="day"] header.site,html[data-v="n5"][data-mode="day"] nav.main{background:var(--surface);box-shadow:0 4px 0 0 var(--hline),0 6px 0 0 var(--hline2)}
+html[data-v="n5"][data-mode="day"] .brand span{color:var(--fg)}
+html[data-v="n5"][data-mode="day"] .menu-btn{color:var(--accent-fg);background:var(--accent);box-shadow:0 -3px 0 0 var(--accent),0 3px 0 0 var(--accent),-3px 0 0 0 var(--accent),3px 0 0 0 var(--accent)}
+html[data-v="n5"][data-mode="day"] .h1-hero,html[data-v="n5"][data-mode="day"] .strip,html[data-v="n5"][data-mode="day"] .dict-hero,html[data-v="n5"][data-mode="day"] .vx-bake,html[data-v="n5"][data-mode="day"] .price-card.hot,html[data-v="n5"][data-mode="day"] footer.site{background:var(--band);color:var(--fg)}
+html[data-v="n5"][data-mode="day"] .h1-hero::after,html[data-v="n5"][data-mode="day"] .badge-wrap::before{opacity:.25}
+html[data-v="n5"][data-mode="day"] .n5-sky{opacity:.35}
+html[data-v="n5"][data-mode="day"] .h1-hero h1,html[data-v="n5"][data-mode="day"] .page-hero h1{color:var(--fg);text-shadow:3px 3px 0 var(--hline2)}
+html[data-v="n5"][data-mode="day"] .h1-hero .dict,html[data-v="n5"][data-mode="day"] .dict-hero *{color:var(--fg)}
+html[data-v="n5"][data-mode="day"] .vx-card .t,html[data-v="n5"][data-mode="day"] .tile span{color:#fff}
+html[data-v="n5"][data-mode="day"] .mode-btn{border-color:var(--fg);color:var(--fg)}
+html[data-v="n5"][data-mode="night"] .mode-btn{border-color:#3ff0ff;color:#3ff0ff;border-radius:0;box-shadow:3px 3px 0 #ff4fa8}
+/* hub */
+html[data-mode="day"] .pd-hub{background:linear-gradient(180deg,var(--hb2) 0,var(--hb1) 70%);color:var(--htxt);border-bottom-color:var(--hline)}
+html[data-mode="day"] .pd-back{color:var(--hsub);background:var(--hcab);box-shadow:0 0 0 3px var(--hsub),4px 4px 0 3px var(--hline2)}
+html[data-mode="day"] .pd-back:hover,html[data-mode="day"] .pd-back:focus-visible{background:var(--hsub);color:var(--hcab)}
+html[data-mode="day"] .pd-cab{background:var(--hcab);box-shadow:0 0 0 4px var(--hline2),0 0 0 8px var(--hcab),0 0 0 12px var(--hline),0 20px 44px -16px rgba(194,76,86,.45)}
+html[data-mode="day"] .pd-cab-title{color:var(--htxt);text-shadow:3px 3px 0 var(--hline2)}
+html[data-mode="day"] .pd-cab-sub{color:var(--hsub)}
+html[data-mode="day"] .pd-tabs button{color:var(--htabtxt);background:var(--htab);box-shadow:inset 0 0 0 2px var(--hline2)}
+html[data-mode="day"] .pd-tabs button[aria-selected="true"]{background:var(--hline);color:#fff;box-shadow:inset 0 0 0 2px var(--hline),0 4px 12px rgba(232,70,124,.35)}
+html[data-mode="day"] .pd-mycoupon{color:#fff;background:var(--hline);box-shadow:4px 4px 0 var(--hline2)}
+/* the main site's arcade button in day mode */
+html[data-v="0"] .pd-play{background:var(--surface);color:var(--fg);box-shadow:0 -4px 0 0 var(--surface),0 4px 0 0 var(--surface),-4px 0 0 0 var(--surface),4px 0 0 0 var(--surface),0 0 0 4px #e8467c,6px 6px 0 4px #ef9a93}
+html[data-v="0"] .pd-play .t{color:var(--fg);text-shadow:2px 2px 0 #f4a2a6}
+html[data-v="0"] .pd-play .s{color:var(--accent)}
+html[data-v="0"] .pd-play .px b{background:#e8467c}html[data-v="0"] .pd-play .px b:nth-child(2){background:#ef9a93}html[data-v="0"] .pd-play .px b:nth-child(3){background:#c24c56}html[data-v="0"] .pd-play .px b:nth-child(4){background:#f4a2a6}
+html[data-v="0"] .pd-play:hover,html[data-v="0"] .pd-play:focus-visible{box-shadow:0 -4px 0 0 var(--surface),0 4px 0 0 var(--surface),-4px 0 0 0 var(--surface),4px 0 0 0 var(--surface),0 0 0 4px #e8467c,8px 8px 0 4px #ef9a93}
+html[data-v="0"] .pd-play:active{box-shadow:0 0 0 4px #e8467c,2px 2px 0 4px #ef9a93}
 
 </style>
 </head>

@@ -61,8 +61,19 @@
     {goal:80, time:45,v:1.65,gap:.54,hz:.2, haz:['bomb','pin'], pw:['wide','slow','magnet'],wob:.35, rainbow:false,
       intro:['CATCH 80 POINTS','IN 45 SECONDS'],nw:'TREATS WOBBLE. FASTER!'},
     {goal:110,time:50,v:1.9, gap:.46,hz:.24,haz:['bomb','pin'], pw:['wide','slow','magnet'],wob:.45, rainbow:true,
-      intro:['CATCH 110 POINTS','IN 50 SECONDS'],nw:'RAINBOW POPS = 5 POINTS!'}
+      intro:['CATCH 110 POINTS','IN 50 SECONDS'],nw:'RAINBOW POPS = 5 POINTS!'},
+    {goal:130,time:50,v:2.05,gap:.43,hz:.27,haz:['bomb','pin'], pw:['wide','slow','magnet'],wob:.5,  rainbow:true,
+      intro:['CATCH 130 POINTS','IN 50 SECONDS'],nw:'EVEN FASTER TREATS!'},
+    {goal:150,time:50,v:2.2, gap:.4, hz:.31,haz:['bomb','pin'], pw:['wide','slow','magnet'],wob:.55, rainbow:true,
+      intro:['CATCH 150 POINTS','IN 50 SECONDS'],nw:'MORE BOMBS FALLING!'},
+    {goal:170,time:55,v:2.35,gap:.37,hz:.34,haz:['bomb','pin','pin'],pw:['wide','slow','magnet'],wob:.6,rainbow:true,
+      intro:['CATCH 170 POINTS','IN 55 SECONDS'],nw:'ROLLING PIN STORM!'},
+    {goal:190,time:55,v:2.5, gap:.34,hz:.37,haz:['bomb','pin'], pw:['wide','slow','magnet'],wob:.65, rainbow:true,pwg:1.4,
+      intro:['CATCH 190 POINTS','IN 55 SECONDS'],nw:'POWER-UPS ARE RARER'},
+    {goal:220,time:60,v:2.7, gap:.31,hz:.4, haz:['bomb','pin'], pw:['wide','slow','magnet'],wob:.7,  rainbow:true,pwg:1.5,
+      intro:['CATCH 220 POINTS','IN 60 SECONDS'],nw:'FINAL LEVEL. GOOD LUCK!'}
   ];
+  const NLV=LV.length;
   const PW={wide:{d:8,t:'WIDE PIG!',s:'WIDE'},slow:{d:6,t:'SLOW-MO!',s:'SLOW'},magnet:{d:8,t:'MAGNET!',s:'MAGNET'}};
   const FX_COL={pop:'#ff4fa8',cookie:'#9dff4f',roll:'#3ff0ff',rainbow:'#ffffff'};
 
@@ -78,16 +89,17 @@
           '<span class="pdgc-k">GOAL<b data-h="goal">0/20</b></span>'+
           '<span class="pdgc-k">TIME<b data-h="time">40</b></span>'+
           '<span class="pdgc-hearts" data-h="hearts" role="img" aria-label="3 hearts"></span>'+
-          '<button type="button" class="pdgc-pause" aria-label="Pause">II</button>'+
+          '<button type="button" class="pdgc-pause pdgc-off" aria-label="Pause" tabindex="-1">II</button>'+
         '</div>'+
         '<div class="pdgc-screen">'+
           '<canvas tabindex="0" aria-label="Catch the Treats. Move the pig with your finger, your mouse or the arrow keys."></canvas>'+
           '<div class="pdgc-over" aria-live="polite"></div>'+
         '</div>'+
+        '<div class="pdgc-steer" aria-hidden="true"><span>◀ DRAG HERE TO STEER ▶</span></div>'+
         '<p class="pdgc-help">DRAG or ◀ ▶ to move · P to pause</p>'+
       '</div>';
     const $=s=>host.querySelector(s);
-    const cv=$('canvas'),scr=$('.pdgc-screen'),ov=$('.pdgc-over'),pbtn=$('.pdgc-pause');
+    const cv=$('canvas'),scr=$('.pdgc-screen'),ov=$('.pdgc-over'),pbtn=$('.pdgc-pause'),steer=$('.pdgc-steer'),wrap=$('.pdgc');
     const hL=$('[data-h="lvl"]'),hG=$('[data-h="goal"]'),hT=$('[data-h="time"]'),hH=$('[data-h="hearts"]');
     const ctx=cv.getContext('2d');
 
@@ -101,7 +113,7 @@
     const pig={x:0,w:0,h:0,tx:null};const keys={l:false,r:false};let drag=false;
 
     const getN=(k,d)=>{const v=parseInt(store.get(k),10);return isNaN(v)?d:v};
-    let unlocked=Math.min(5,Math.max(1,getN('pdg-catch-unlocked',1)));
+    let unlocked=Math.min(NLV,Math.max(1,getN('pdg-catch-unlocked',1)));
     let best=getN('pdg-catch-best',0);
 
     /* ---------- HUD ---------- */
@@ -210,7 +222,7 @@
       if(shake>0)shake-=dt;if(flash>0)flash-=dt;
       if(time<=0){time=0;hud();fail('TIME UP');return}
       spawnT-=dt;if(spawnT<=0){spawnT=cfg.gap*(.75+Math.random()*.5);spawnItem()}
-      if(cfg.pw.length){powT-=dt;if(powT<=0){powT=9+Math.random()*5;spawnPower()}}
+      if(cfg.pw.length){powT-=dt;if(powT<=0){powT=(9+Math.random()*5)*(cfg.pwg||1);spawnPower()}}
       if(keys.l||keys.r){pig.tx=null;pig.x+=((keys.r?1:0)-(keys.l?1:0))*W*1.1*dt}else if(pig.tx!=null){pig.x+=(pig.tx-pig.x)*Math.min(1,dt*16)}
       clampPig();
       const sf=pow.slow>0?.5:1,fy=floorY(),top=fy-pig.h,pw=pigW(),l=pig.x-pw/2-px,r=pig.x+pw/2+px;
@@ -247,7 +259,7 @@
       }
       if(o.picker){
         h+='<p class="pdgc-m pdgc-pick-l">PICK A LEVEL</p><div class="pdgc-pick">';
-        for(let i=0;i<5;i++){const lock=i>=unlocked;h+='<button type="button" data-lv="'+i+'"'+(lock?' disabled aria-label="Level '+(i+1)+' locked"':' aria-label="Level '+(i+1)+'"')+'>'+(lock?'<i aria-hidden="true">■</i>':(i+1))+'</button>'}
+        for(let i=0;i<NLV;i++){const lock=i>=unlocked;h+='<button type="button" data-lv="'+i+'"'+(lock?' disabled aria-label="Level '+(i+1)+' locked"':' aria-label="Level '+(i+1)+'"')+'>'+(lock?'<i aria-hidden="true">■</i>':(i+1))+'</button>'}
         h+='</div>';
         if(best)h+='<p class="pdgc-m pdgc-best">BEST '+best+'</p>';
       }
@@ -257,10 +269,10 @@
       ov.querySelectorAll('[data-lv]').forEach(el=>el.addEventListener('click',()=>{if(!el.disabled){total=0;startLevel(+el.dataset.lv)}}));
       const f=ov.querySelector('.pdgc-b:not(.pdgc-ghost)')||ov.querySelector('[data-lv]:not([disabled])');
       if(f&&o.focus!==false){try{f.focus({preventScroll:true})}catch(e){}}
-      pbtn.hidden=!running;
+      setPause(running&&!paused);
     }
     function menu(){
-      running=false;paused=false;items=[];fx=[];resetPow();lvl=Math.min(unlocked-1,4);cfg=LV[lvl];lsc=0;time=cfg.time;hearts=3;combo=0;mult=1;hud();
+      running=false;paused=false;items=[];fx=[];resetPow();lvl=Math.min(unlocked-1,NLV-1);cfg=LV[lvl];lsc=0;time=cfg.time;hearts=3;combo=0;mult=1;hud();
       over({title:'CATCH THE TREATS',legend:true,picker:true,focus:false});startIdle();
     }
     function resetPow(){pow.wide=pow.slow=pow.magnet=0}
@@ -270,37 +282,44 @@
       over({title:'LEVEL '+(i+1),lines:cfg.intro,nw:cfg.nw,buttons:[{label:'GO!',fn:begin}]});startIdle();
     }
     function begin(){
-      size();running=true;paused=false;keys.l=keys.r=false;ov.hidden=true;pbtn.hidden=false;hud();
+      size();running=true;paused=false;keys.l=keys.r=false;ov.hidden=true;setPause(true);hud();
       last=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);try{cv.focus({preventScroll:true})}catch(e){}
     }
     function saveBest(){if(total>best){best=total;store.set('pdg-catch-best',String(best));return true}return false}
-    function stopRun(){running=false;paused=false;cancelAnimationFrame(raf);raf=0;keys.l=keys.r=false;drag=false;items=[];resetPow();hud();draw()}
+    function stopRun(){running=false;paused=false;setPause(false);cancelAnimationFrame(raf);raf=0;keys.l=keys.r=false;drag=false;items=[];resetPow();hud();draw()}
     function levelClear(){
       const bonus=Math.ceil(time);total+=bonus;stopRun();
-      if(lvl+2>unlocked&&lvl<4){unlocked=lvl+2;store.set('pdg-catch-unlocked',String(unlocked))}
+      if(lvl+2>unlocked&&lvl<NLV-1){unlocked=lvl+2;store.set('pdg-catch-unlocked',String(unlocked))}
       const nb=saveBest();
-      if(lvl===4){
-        over({title:'YOU BEAT ALL 5 LEVELS!',cls:'pdgc-win',lines:['SCORE '+total,'TIME BONUS +'+bonus].concat(nb?['NEW BEST!']:[]),buttons:[{label:'PLAY AGAIN',fn:menu}]});
-        if(!won){won=true;try{api.win&&api.win('catch',total)}catch(e){}}
+      if(lvl===NLV-1){
+        over({title:'YOU BEAT ALL 10!',cls:'pdgc-win',lines:['SCORE '+total,'TIME BONUS +'+bonus].concat(nb?['NEW BEST!']:[]),buttons:[{label:'PLAY AGAIN',fn:()=>{total=0;startLevel(0)}},{label:'LEVELS',ghost:true,fn:menu}]});
         startIdle();return;
       }
-      over({title:'LEVEL '+(lvl+1)+' CLEAR!',lines:['TIME BONUS +'+bonus,'SCORE '+total],buttons:[{label:'NEXT LEVEL',fn:()=>startLevel(lvl+1)},{label:'MENU',ghost:true,fn:menu}]});
+      over({title:'LEVEL '+(lvl+1)+' CLEAR!',cls:lvl===4?'pdgc-win':'',lines:['TIME BONUS +'+bonus,'SCORE '+total].concat(nb?['NEW BEST!']:[]),buttons:[{label:'NEXT LEVEL',fn:()=>startLevel(lvl+1)},{label:'LEVELS',ghost:true,fn:menu}]});
+      if(lvl===4&&!won){won=true;try{api.win&&api.win('catch',total)}catch(e){}}
       startIdle();
     }
     function fail(why){
       stopRun();const nb=saveBest();
-      over({title:why,lines:['LEVEL '+(lvl+1),'SCORE '+total].concat(nb?['NEW BEST!']:[]),buttons:[{label:'TRY AGAIN',fn:()=>{total=totalAtStart;startLevel(lvl)}},{label:'MENU',ghost:true,fn:menu}]});
+      over({title:why,lines:['LEVEL '+(lvl+1),'SCORE '+total].concat(nb?['NEW BEST!']:[]),buttons:[{label:'TRY AGAIN',fn:()=>{total=totalAtStart;startLevel(lvl)}},{label:'LEVELS',ghost:true,fn:menu}]});
       startIdle();
     }
     function pause(){if(!running||paused)return;paused=true;cancelAnimationFrame(raf);raf=0;keys.l=keys.r=false;drag=false;
-      over({title:'PAUSED',lines:['LEVEL '+(lvl+1)+' · '+Math.min(lsc,cfg.goal)+'/'+cfg.goal],buttons:[{label:'RESUME',fn:resume},{label:'QUIT',ghost:true,fn:menu}]});pbtn.hidden=true}
-    function resume(){if(!running||!paused)return;paused=false;ov.hidden=true;pbtn.hidden=false;last=performance.now();raf=requestAnimationFrame(loop);try{cv.focus({preventScroll:true})}catch(e){}}
+      over({title:'PAUSED',lines:['LEVEL '+(lvl+1)+' · '+Math.min(lsc,cfg.goal)+'/'+cfg.goal],buttons:[{label:'RESUME',fn:resume},{label:'QUIT',ghost:true,fn:menu}]});setPause(false)}
+    function resume(){if(!running||!paused)return;paused=false;ov.hidden=true;setPause(true);last=performance.now();raf=requestAnimationFrame(loop);try{cv.focus({preventScroll:true})}catch(e){}}
 
     /* ---------- input ---------- */
-    const aim=e=>{const r=cv.getBoundingClientRect();pig.tx=Math.min(Math.max(e.clientX-r.left,0),r.width)};
-    const onDown=e=>{if(!running||paused)return;drag=true;try{cv.setPointerCapture(e.pointerId)}catch(_){}aim(e);e.preventDefault()};
-    const onMove=e=>{if(!running||paused)return;if(drag||e.pointerType==='mouse')aim(e)};
-    const onUp=e=>{drag=false;try{cv.releasePointerCapture(e.pointerId)}catch(_){}};
+    function setPause(on){pbtn.classList.toggle('pdgc-off',!on);pbtn.tabIndex=on?0:-1;wrap.classList.toggle('pdgc-live',running&&!paused)}
+    /* steering: canvas and the strip under it both map finger x to the canvas width */
+    const aim=e=>{const r=cv.getBoundingClientRect();if(!r.width)return;pig.tx=Math.min(Math.max(e.clientX-r.left,0),r.width)*(W/r.width)};
+    let capEl=null;
+    const onDown=e=>{if(!running||paused)return;if(e.pointerType==='mouse'&&e.button!==0)return;drag=true;capEl=e.currentTarget;try{capEl.setPointerCapture(e.pointerId)}catch(_){}aim(e);e.preventDefault()};
+    const onMove=e=>{if(!running||paused)return;if(drag||(e.pointerType==='mouse'&&e.currentTarget===cv))aim(e)};
+    const onUp=e=>{drag=false;try{(capEl||cv).releasePointerCapture(e.pointerId)}catch(_){}capEl=null};
+    /* iOS Safari: block page scroll while a level is running (but let buttons get their taps) */
+    const isBtn=t=>!!(t&&t.closest&&t.closest('button'));
+    const onTS=e=>{if(running&&!paused&&!isBtn(e.target))e.preventDefault()};
+    const onTM=e=>{if(running&&!paused||drag)e.preventDefault()};
     const K={ArrowLeft:'l',a:'l',A:'l',ArrowRight:'r',d:'r',D:'r'};
     const onKey=e=>{
       if(destroyed||!running)return;
@@ -309,7 +328,8 @@
     };
     const onVis=()=>{if(document.hidden)pause()};
     const onPause=()=>pause();
-    cv.addEventListener('pointerdown',onDown);cv.addEventListener('pointermove',onMove);cv.addEventListener('pointerup',onUp);cv.addEventListener('pointercancel',onUp);
+    [cv,steer].forEach(el=>{el.addEventListener('pointerdown',onDown);el.addEventListener('pointermove',onMove);el.addEventListener('pointerup',onUp);el.addEventListener('pointercancel',onUp);el.addEventListener('lostpointercapture',onUp)});
+    wrap.addEventListener('touchstart',onTS,{passive:false});wrap.addEventListener('touchmove',onTM,{passive:false});
     pbtn.addEventListener('click',onPause);
     addEventListener('keydown',onKey);addEventListener('keyup',onKey);document.addEventListener('visibilitychange',onVis);
     let io=null,ro=null;
@@ -322,7 +342,8 @@
 
     function destroy(){
       destroyed=true;running=false;paused=false;cancelAnimationFrame(raf);raf=0;
-      cv.removeEventListener('pointerdown',onDown);cv.removeEventListener('pointermove',onMove);cv.removeEventListener('pointerup',onUp);cv.removeEventListener('pointercancel',onUp);
+      [cv,steer].forEach(el=>{el.removeEventListener('pointerdown',onDown);el.removeEventListener('pointermove',onMove);el.removeEventListener('pointerup',onUp);el.removeEventListener('pointercancel',onUp);el.removeEventListener('lostpointercapture',onUp)});
+      wrap.removeEventListener('touchstart',onTS);wrap.removeEventListener('touchmove',onTM);
       pbtn.removeEventListener('click',onPause);
       removeEventListener('keydown',onKey);removeEventListener('keyup',onKey);document.removeEventListener('visibilitychange',onVis);removeEventListener('resize',size);
       if(io)io.disconnect();if(ro)ro.disconnect();

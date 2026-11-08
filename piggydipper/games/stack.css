@@ -22,8 +22,8 @@
 .pdg-stack-btn.alt{background:#b48cff;box-shadow:0 4px 0 #4a2a8a,inset 0 -3px 0 rgba(0,0,0,.18)}
 .pdg-stack-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #7a1450}
 .pdg-stack-btn:focus-visible,.pdg-stack-lv:focus-visible,.pdg-stack-key:focus-visible{outline:3px solid #3ff0ff;outline-offset:2px}
-.pdg-stack-levels{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-.pdg-stack-lv{font:inherit;font-size:13px;width:44px;height:44px;color:#140b26;background:#9dff4f;border:0;cursor:pointer;box-shadow:0 4px 0 #3c8a1e;touch-action:manipulation}
+.pdg-stack-levels{display:grid;grid-template-columns:repeat(5,40px);gap:8px;justify-content:center}
+.pdg-stack-lv{font:inherit;font-size:12px;width:40px;height:40px;padding:0;color:#140b26;background:#9dff4f;border:0;cursor:pointer;box-shadow:0 4px 0 #3c8a1e;touch-action:manipulation}
 .pdg-stack-lv:active{transform:translateY(3px);box-shadow:0 1px 0 #3c8a1e}
 .pdg-stack-lv:disabled{background:#2a1650;color:#5b4a86;box-shadow:0 4px 0 #1d1038;cursor:not-allowed}
 .pdg-stack-pad{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;width:100%}
