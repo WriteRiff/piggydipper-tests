@@ -2266,6 +2266,7 @@ addEventListener('hashchange',route); route();
   function sync(){const m=M.pick();if(m===root.dataset.mode)return;root.classList.add('pd-fade');M.apply(m);setTimeout(()=>root.classList.remove('pd-fade'),700)}
   if(M.q.addEventListener)M.q.addEventListener('change',sync);else if(M.q.addListener)M.q.addListener(sync);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});
+  window.addEventListener('pageshow',sync);sync();
 })();
 
 </script>
