@@ -7,10 +7,11 @@
 <link rel="icon" href="img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="img/logo.png">
 <title>Piggy Dipper Arcade</title>
-<link rel="stylesheet" href="games/catch.css?v=1794177663">
-<link rel="stylesheet" href="games/stack.css?v=1794177663">
-<link rel="stylesheet" href="games/road.css?v=1794177663">
-<link rel="stylesheet" href="games/pop.css?v=1794177663">
+<link rel="stylesheet" href="games/catch.css?v=1794178124">
+<link rel="stylesheet" href="games/stack.css?v=1794178124">
+<link rel="stylesheet" href="games/road.css?v=1794178124">
+<link rel="stylesheet" href="games/pop.css?v=1794178124">
+<link rel="stylesheet" href="games/farm.css?v=1794178124">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2675,6 +2676,9 @@ html[data-v="4"] .pd-play{box-shadow:0 0 0 4px #ff4fa8,6px 6px 0 4px #3ff0ff,0 0
 .pd-c-go:active{transform:translateY(3px);box-shadow:0 1px 0 #3c8a1e}
 .pd-c-more{font:13px/1.4 system-ui,sans-serif;color:#7d52d6;margin:10px 0 0}
 @media (prefers-reduced-motion:reduce){.pd-blink,.pd-coupon{animation:none}}
+.pd-tabs.n5{grid-template-columns:repeat(6,1fr)}
+.pd-tabs.n5 button{grid-column:span 2}
+.pd-tabs.n5 button:nth-child(n+4){grid-column:span 3}
 /* ===== Arcade page: day mode uses the Classic day colors (follows the phone's light/dark setting like the main site) ===== */
 html[data-v="n5"][data-mode="day"]:root{
   --bg:#fff6f3; --fg:#2a1d24; --muted:#8a6570; --surface:#fffdfc; --band:#fbdcd7; --line:rgba(42,29,36,.16);
@@ -4641,17 +4645,18 @@ addEventListener('hashchange',route); route();
 })();
 </script>
 
-<script src="games/catch.js?v=1794177663"></script>
-<script src="games/stack.js?v=1794177663"></script>
-<script src="games/road.js?v=1794177663"></script>
-<script src="games/pop.js?v=1794177663"></script>
+<script src="games/catch.js?v=1794178124"></script>
+<script src="games/stack.js?v=1794178124"></script>
+<script src="games/road.js?v=1794178124"></script>
+<script src="games/pop.js?v=1794178124"></script>
+<script src="games/farm.js?v=1794178124"></script>
 <script>
 /* ===== Piggy Dipper arcade hub ===== */
 (function(){
   const $=s=>document.querySelector(s);
   const hub=$('#pdHub');if(!hub)return;
   const tabs=$('#pdTabs'),stage=$('#pdStage'),prize=$('#pdPrize'),myBtn=$('#pdMyCoupon');
-  const ORDER=['catch','stack','road','pop'];
+  const ORDER=['catch','stack','road','pop','farm'];
   const G=window.PDGames||{};
   const ids=ORDER.filter(id=>G[id]);
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -4665,7 +4670,7 @@ addEventListener('hashchange',route); route();
     const host=document.createElement('div');host.className='pdg pdg-'+id;stage.appendChild(host);
     try{inst=G[id].mount(host,api)||null}catch(e){console.error(id,e);host.textContent='This game could not start.'}
     store.set('pd-arcade-game',id)}
-  ids.forEach(id=>{const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.dataset.id=id;b.textContent=G[id].title;b.addEventListener('click',()=>{if(id!==cur)mount(id)});tabs.appendChild(b)});
+  if(ids.length===5)tabs.classList.add('n5');ids.forEach(id=>{const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.dataset.id=id;b.textContent=G[id].title;b.addEventListener('click',()=>{if(id!==cur)mount(id)});tabs.appendChild(b)});
   tabs.addEventListener('keydown',e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;const i=ids.indexOf(cur);const n=ids[(i+(e.key==='ArrowRight'?1:ids.length-1))%ids.length];mount(n);tabs.querySelector('[data-id="'+n+'"]').focus()});
   const saved=store.get('pd-arcade-game');
   if(ids.length)mount(ids.includes(saved)?saved:ids[0]);
