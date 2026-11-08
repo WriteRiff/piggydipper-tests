@@ -13,7 +13,7 @@ const JUNK = [0, 0, 0, 0, 0, 0, 1, 2, 2, 3];
 /* Look of the L-shaped piece and its mirror. 0 = piping bag (now).
    1 = candy cane, 2 = cake pop & cookie, 3 = cookie stack, 4 = dipping spoon, 5 = mini rolls.
    Change this one number to swap the look. */
-const L_STYLE = 0;
+const L_STYLE = 5;
 const L_NAMES = ['Piping bag', 'Candy cane', 'Cake pop & cookie', 'Cookie stack', 'Dipping spoon', 'Mini rolls'];
 const LINE_PTS = [0, 100, 300, 500, 800];
 
