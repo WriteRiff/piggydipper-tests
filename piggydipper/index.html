@@ -1224,6 +1224,15 @@ html[data-v="4"] .mode-btn{border-color:var(--neon);color:#fff;box-shadow:0 0 10
 html[data-v="4"] .pd-play{box-shadow:0 0 0 4px #ff4fa8,6px 6px 0 4px #3ff0ff,0 0 28px 6px rgba(255,79,168,.45)}
 @keyframes pd-blink{50%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.pd-play .s i{animation:none}}
+@media (max-width:480px){
+  header.site .wrap{gap:.5rem}
+  header.site .brand{gap:.4rem;min-width:0}
+  header.site .brand img{width:42px;height:42px}
+  header.site .brand span{font-size:.92rem}
+  .mode-btn{width:38px;height:38px}
+  .menu-btn{padding:.4em .75em;font-size:.85rem}
+}
+@media (max-width:360px){header.site .brand>span{font-size:.8rem}}
 
 </style>
 </head>
