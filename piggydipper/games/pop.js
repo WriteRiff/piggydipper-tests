@@ -273,7 +273,7 @@ function mount(host,api){
     dying.forEach(d=>d.s-=dt*5.5);dying=dying.filter(d=>d.s>0);
     parts.forEach(p=>{p.vy+=cs*16*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.rot+=p.vr*dt;p.life-=dt*1.3});parts=parts.filter(p=>p.life>0&&p.y<BH+cs);
     floats.forEach(f=>f.t+=dt*1.25);floats=floats.filter(f=>f.t<1);
-    if(banner){banner.t+=dt;if(banner.t>1.7)banner=null}
+    if(banner){if(!banner.s)banner.s=performance.now();banner.t=(performance.now()-banner.s)/1000;if(banner.t>1.7)banner=null}
     if(pendingEnd&&!busyFall()&&!dying.length){if(!pendingEnd.t)pendingEnd={t:performance.now()};else if(performance.now()-pendingEnd.t>420)endLevel()}}
   function draw(){
     if(!BW)return;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,BW,BH);
