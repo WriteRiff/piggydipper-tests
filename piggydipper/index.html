@@ -14,7 +14,7 @@
 <script>(function(){var r=document.documentElement;
 function auto(){var h=new Date().getHours();return (h>=21||h<5)?'night':'day'}
 function pick(){var m=null;try{var o=JSON.parse(localStorage.getItem('pd-mode')||'null');if(o&&(o.m==='day'||o.m==='night')&&Date.now()-o.t<6*36e5)m=o.m}catch(e){}return m||auto()}
-function apply(m){if(!r.hasAttribute('data-lockv'))r.dataset.v=m==='night'?'4':'0';r.dataset.mode=m}
+function apply(m){if(!r.hasAttribute('data-lockv'))r.dataset.v=m==='night'?'4':'0';r.dataset.mode=m;r.dataset.theme='light'}
 window.__pdMode={auto:auto,pick:pick,apply:apply};apply(pick())})();
 </script>
 <style>
@@ -1233,18 +1233,14 @@ html[data-v="4"] .pd-play{box-shadow:0 0 0 4px #ff4fa8,6px 6px 0 4px #3ff0ff,0 0
   .menu-btn{padding:.4em .75em;font-size:.85rem}
 }
 @media (max-width:360px){header.site .brand>span{font-size:.8rem}}
-/* ===== Arcade page: day mode uses the Classic day colors (follows the phone's light/dark setting like the main site) ===== */
+/* ===== Arcade page: day mode uses the Classic light day colors ===== */
 html[data-v="n5"][data-mode="day"]:root{
   --bg:#fff6f3; --fg:#2a1d24; --muted:#8a6570; --surface:#fffdfc; --band:#fbdcd7; --line:rgba(42,29,36,.16);
   --accent:#e8467c; --accent-fg:#fffaf5; --rose:#e8467c; --stick:#fbf3ee;
   --pk:#e8467c; --cy:#c24c56; --li:#c24c56; --lv:#a0607a; --ink:#2a1d24; --deep:#fbdcd7; color-scheme:light;
   --hb1:#fff6f3; --hb2:#fbdcd7; --hcab:#fffdfc; --hline:#e8467c; --hline2:#ef9a93; --htxt:#2a1d24; --hsub:#c24c56; --htab:#fff6f3; --htabtxt:#6b4a58;
 }
-@media (prefers-color-scheme:dark){html[data-v="n5"][data-mode="day"]:root{
-  --bg:#19141a; --fg:#fbeef0; --muted:#cfaab6; --surface:#241d25; --band:#3a2431; --line:rgba(251,238,240,.16);
-  --accent:#f4a2a6; --accent-fg:#1f1620; --rose:#f4a2a6; --pk:#f4a2a6; --cy:#f7c4c6; --li:#f7c4c6; --lv:#d7a6c0; --ink:#1f1620; --deep:#241d25; color-scheme:dark;
-  --hb1:#2d222c; --hb2:#19141a; --hcab:#241d25; --hline:#f4a2a6; --hline2:#c24c56; --htxt:#fbeef0; --hsub:#f7c4c6; --htab:#19141a; --htabtxt:#fbeef0;
-}}
+
 html[data-v="n5"][data-mode="day"] body{background:var(--bg)}
 html[data-v="n5"][data-mode="day"] body::after{display:none}
 html[data-v="n5"][data-mode="day"] header.site,html[data-v="n5"][data-mode="day"] nav.main{background:var(--surface);box-shadow:0 4px 0 0 var(--hline),0 6px 0 0 var(--hline2)}
