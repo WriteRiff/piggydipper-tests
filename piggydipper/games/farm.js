@@ -49,11 +49,11 @@ crates:["...o..o.....","..CCC.CC....","............","GGGGGGGGGGGG","###########
 
 /* ------------------------------------------------------------------ levels */
 var LEVELS=[
- {name:'FARMYARD',theme:'farm',goal:'barn',en:{e:'goose',f:'farmer',t:'sheepdog'},
-  seq:['start','flat','gap2','flat2','enemy','stairs','flat','pitplat','chk','hill','lane','enemy','gap2','crates','rails','goal']},
- {name:'THE BIG BARN',theme:'barn',goal:'barnout',en:{e:'goat',f:'farmer',t:'goat'},
+ {name:'FARMYARD',theme:'farm',goal:'barn',en:{e:'goose',f:'cowboy',t:'sheepdog'},
+  seq:['start','flat','gap2','flat2','enemy','stairs','flat','pitplat','chk','hill','lane','enemy2','gap2','crates','rails','goal']},
+ {name:'THE BIG BARN',theme:'barn',goal:'barnout',en:{e:'goat',f:'cowboy',t:'goat'},
   seq:['start','flat','loft','enemy','tower','gap2','chk','islands','enemy2','stairs','loft','lane','crates','goal']},
- {name:'BACK PASTURE',theme:'farm',goal:'gate',en:{e:'sheepdog',f:'farmer',t:'fox'},
+ {name:'BACK PASTURE',theme:'farm',goal:'gate',en:{e:'sheepdog',f:'cowboy',t:'fox'},
   seq:['start','flat2','enemy','gap3','hillE','rails','chk','pitplat','enemy2','thorns','lane','cratepit','chk','hill','double','goal']},
  {name:'THE NEIGHBORHOOD',theme:'houses',goal:'signTown',en:{e:'dog',f:'officer',t:'dog'},
   seq:['start','flat','enemy','rails','gap3','enemy2','chk','hazard','tower','islands','double','chk','hillE','awnings','goal']},
@@ -65,9 +65,9 @@ var LEVELS=[
   seq:['start','flat2','enemy','gap3','lane','islands','chk','hillE','bigpit','double','chk','thorns','cratepit','lane','rollhi','enemy2','goal']},
  {name:'BACKYARDS',theme:'yards',goal:'signHome',en:{e:'dog',f:'officer',t:'sheepdog'},
   seq:['start','flat','rails','double','gap4','enemy2','chk','tower','islands','hazard','humans','chk','pitplat','bigpit','lane','awnings','double','goal']},
- {name:'BACK ROADS',theme:'corn',goal:'signHome',en:{e:'fox',f:'farmer',t:'wolf'},
+ {name:'BACK ROADS',theme:'corn',goal:'signHome',en:{e:'fox',f:'cowboy',t:'wolf'},
   seq:['start','flat2','lane','gap4','hillE','thorns','chk','enemy2','bigpit','double','cratepit','chk','islands','lane','humans','gap4','rollhi','goal']},
- {name:'HOME FARM',theme:'home',goal:'home',en:{e:'sheepdog',f:'farmer',t:'goat'},
+ {name:'HOME FARM',theme:'home',goal:'home',en:{e:'sheepdog',f:'cowboy',t:'goat'},
   seq:['start','flat','double','gap4','loft','chk','lane','bigpit','humans','tower','chk','thorns','islands','double','cratepit','chk','hillE','lane','goal']}
 ];
 
@@ -202,6 +202,9 @@ var GOAT_L={a:["..wd.wd..wd.wd..","..dd.dd..dd.dd.."],b:["...wd.wdwd.wd...","...
 var HUM=["................",".....kkkkkk.....","....kccccccck...","....kcccccccckk.","....kssssssk....","....ksssseskk...","....kssssssssk..",".....kSSSSSk....","....kggggggk....","...kggggggggk...","...kgoggggogk...","...kgoooooogk...","...ksoooooosk...","...kkoooooookk..","....kooooook....","....kOOOOOOk...."];
 var HUM_L={a:["....kook.kook...","....kook.kook...","....kook.kook...","....kOOk.kOOk...","....kbbk.kbbbk..","....kbbbkkbbbk..","....kkkkkkkkkk..","................"],
  b:["...kook..kook...","...kook...kook..","..kook....kook..","..kOOk....kOOk..",".kbbbk....kbbbk.",".kkkkk....kkkkk.","................","................"]};
+var COWBOY=["......kkkk......",".....khhhhk.....",".....khbbhk.....","..kkkkhhhhkkkk..",".khhhhhhhhhhhhk.","..kkkkkkkkkkkk..","....kssssssk....","....ksssseskk...","....kssssssssk..",".....kRRRRRk....","....kgRRRggk....","...kggggggggk...","...kgvggggvgk...","...ksvvvvvvsk...","...kkoooooookk..","....kOOOOOOk...."];
+var COWBOY_L={a:["....kook.kook...","....kook.kook...","....kBBk.kBBk...","....kBBk.kBBk...","....kBBBkkBBBk..","....kBBBkkBBBk..","....kkkkkkkkkk..","................"],
+ b:["...kook..kook...","..kook....kook..","..kBBk....kBBk..",".kBBBk....kBBBk.",".kBBBk....kBBBk.",".kkkkk....kkkkk.","................","................"]};
 var COOKIE=["....llll....","..llllllll..",".llcllllvll.",".llllllllll.","lllllpllllll","llvllllllcll","llllllllllll",".lllcllllll.",".lllllllvll.","..llllllll..","....llll...."];
 var ROLL=["...wwwwww...",".wwvvvvvvww.","wwvwwwwwwvww","wvwwvvvvwwvw","wvwvwwwwvwvw","wvwvwvvwvwvw","wvwvwwvwvwvw","wvwwvvvwwwvw","wwvwwwwwwvww",".wwvvvvvvww.","...wwwwww..."];
 var POP=["..pppp..",".phhppp.","phhppppp","phpppcpp","pcpppPpp","pppppPpp",".ppPPcp.",".pppppp.","..pppp..","...ww...","...ww...","...ww...","...ww...","...ww..."];
@@ -214,6 +217,7 @@ var ENEMY={
  wolf:{w:15,h:11,body:WOLF,legs:WOLF_L,pal:{g:'#9a93b4',G:'#69618a',w:'#ece8f6',e:'#3ff0ff',d:'#2a2438'},spd:.5},
  goat:{w:14,h:11,body:GOAT,legs:GOAT_L,pal:{w:'#f6f2fc',g:'#b8b0cc',h:'#6a6080',e:'#140b26',d:'#4a4266'},spd:.35},
  farmer:{w:10,h:22,body:HUM,legs:HUM_L,pal:{k:'#2a1d3a',c:'#3a6fd8',s:'#ffcfd2',S:'#ec9cb0',e:'#140b26',g:'#2fbf71',o:'#2f5fb8',O:'#244a90',b:'#3a2a5a'},spd:.4,human:true},
+ cowboy:{w:10,h:22,body:COWBOY,legs:COWBOY_L,pal:{k:'#2a1d3a',h:'#8a80b0',b:'#ff4fa8',s:'#ffcfd2',e:'#140b26',R:'#e8457a',g:'#4a8fe0',v:'#5a5478',o:'#2f5fb8',O:'#244a90',B:'#3a3352'},spd:.45,human:true,lasso:true},
  officer:{w:10,h:22,body:HUM,legs:HUM_L,pal:{k:'#1f1a30',c:'#4a5878',s:'#f6b6c4',S:'#d88aa2',e:'#140b26',g:'#a8bce0',o:'#4a5878',O:'#353f5a',b:'#1f1a30'},spd:.55,human:true}
 };
 
@@ -438,7 +442,7 @@ function mount(host,api){
         else if(e.st==='charge'){spd=2.1;if(e.t>70){e.st='walk';e.cd=50}}
         break;
       default: // farmer, officer
-        var range=e.type==='officer'?44:36;
+        var range=e.type==='farmer'?36:44;
         if(e.st==='walk'&&e.cd===0&&facing&&adx<range&&Math.abs(dy)<20){e.st='lunge';e.t=0}
         if(e.st==='lunge'){spd=e.t<10?0:(e.t<20?1.2:0);if(e.t>32){e.st='walk';e.cd=60}}
     }
@@ -458,7 +462,7 @@ function mount(host,api){
       if(p.vy>0&&(p.y+p.h)-e.y<9){e.ko=1;e.vy=-2;cookies+=0;p.vy=p.hold?Q.jump*.95:P.bounce;puff(e.x+e.w/2,e.y,8,'#ffffff');stars(e.x+e.w/2,e.y)}
       else hurt(e.x+e.w/2)}
     else if(D.human&&e.st==='lunge'&&e.t>=8&&e.t<=26){
-      var nx=e.dir>0?e.x+e.w:e.x-16,net={x:nx,y:e.y+4,w:16,h:12};if(overlap(p,net))hurt(e.x+e.w/2)}
+      var nw=D.lasso?20:16,nx=e.dir>0?e.x+e.w:e.x-nw,net={x:nx,y:e.y+2,w:nw,h:14};if(overlap(p,net))hurt(e.x+e.w/2)}
   }
   function overlap(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
 
@@ -513,7 +517,13 @@ function mount(host,api){
       if(e.dir<0){b.translate(dx+iw,dy+sq);b.scale(-1,1);b.drawImage(img,0,0,iw,ih-sq)}else{b.translate(dx,dy+sq);b.drawImage(img,0,0,iw,ih-sq)}
     }
     b.restore();
-    if(D.human&&!e.ko){ // net on a pole
+    if(D.lasso&&!e.ko){ // lasso: spins over the hat, then flies forward
+      var lx=x+e.w/2+e.dir*4,ly=e.y+12,thr=e.st==='lunge'&&e.t>=8&&e.t<=26;
+      b.strokeStyle='#e4d6ff';b.lineWidth=1;b.beginPath();
+      if(thr){var cx2=lx+e.dir*16,cy2=ly-1;b.moveTo(lx,ly);b.lineTo(cx2-e.dir*5,cy2);b.stroke();b.beginPath();b.ellipse(cx2,cy2,5,5,0,0,7);b.stroke()}
+      else{var a=reduce?0:tick*.25,cx3=x+e.w/2+Math.cos(a)*1.5,cy3=e.y-5;b.moveTo(lx,ly);b.lineTo(cx3+e.dir*3,cy3+1);b.stroke();b.beginPath();b.ellipse(cx3,cy3,7,2+Math.abs(Math.sin(a)),0,0,7);b.stroke()}
+    }
+    else if(D.human&&!e.ko){ // net on a pole
       var hx=x+e.w/2+e.dir*5,hy=e.y+12,ext=e.st==='lunge'&&e.t>=8&&e.t<=26;
       b.strokeStyle='#d8d0ec';b.lineWidth=1;b.beginPath();
       var ex=ext?hx+e.dir*18:hx+e.dir*4,ey=ext?hy-2:hy-16;b.moveTo(hx,hy);b.lineTo(ex,ey);b.stroke();
