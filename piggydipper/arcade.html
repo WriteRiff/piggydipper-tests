@@ -7,20 +7,20 @@
 <link rel="icon" href="img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="img/logo.png">
 <title>Piggy Dipper Arcade</title>
-<link rel="stylesheet" href="games/catch.css?v=1794179792">
-<link rel="stylesheet" href="games/stack.css?v=1794179792">
-<link rel="stylesheet" href="games/road.css?v=1794179792">
-<link rel="stylesheet" href="games/pop.css?v=1794179792">
-<link rel="stylesheet" href="games/farm.css?v=1794179792">
+<link rel="stylesheet" href="games/catch.css?v=1794179954">
+<link rel="stylesheet" href="games/stack.css?v=1794179954">
+<link rel="stylesheet" href="games/road.css?v=1794179954">
+<link rel="stylesheet" href="games/pop.css?v=1794179954">
+<link rel="stylesheet" href="games/farm.css?v=1794179954">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Caveat:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,400;1,9..144,600&family=Ultra&family=Anton&family=Chewy&family=Tilt+Neon&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Lobster&family=Bebas+Neue&family=Shrikhand&family=Bowlby+One&family=Space+Grotesk:wght@400;500;700&family=Unbounded:wght@400;600;800&family=Manrope:ital,wght@0,400;0,600;0,800;1,400&family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Patrick+Hand&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter+Tight:wght@400;500;600;700&family=Press+Start+2P&family=VT323&family=Silkscreen:wght@400;700&display=swap">
-<script>document.documentElement.dataset.v='n5';document.documentElement.setAttribute('data-lockv','');(function(){var r=document.documentElement;
-function auto(){var h=new Date().getHours();return (h>=21||h<5)?'night':'day'}
-function pick(){var m=null;try{var o=JSON.parse(localStorage.getItem('pd-mode')||'null');if(o&&(o.m==='day'||o.m==='night')&&Date.now()-o.t<6*36e5)m=o.m}catch(e){}return m||auto()}
+<script>document.documentElement.dataset.v='n5';document.documentElement.setAttribute('data-lockv','');(function(){var r=document.documentElement,q=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
+function pick(){return q&&q.matches?'night':'day'}
 function apply(m){if(!r.hasAttribute('data-lockv'))r.dataset.v=m==='night'?'4':'0';r.dataset.mode=m;r.dataset.theme='light'}
-window.__pdMode={auto:auto,pick:pick,apply:apply};apply(pick())})();
+try{localStorage.removeItem('pd-mode')}catch(e){}
+window.__pdMode={pick:pick,apply:apply,q:q};apply(pick())})();
 (function(){function out(){var h=location.hash.slice(1);if(h&&h!=='home'&&h.indexOf('home-')!==0){location.replace('index.html#'+h);return true}return false}out();addEventListener('hashchange',out)})();</script>
 <style>
 [hidden]{display:none!important}
@@ -2732,7 +2732,6 @@ html[data-v="n5"][data-mode="day"] .h1-hero .dict,html[data-v="n5"][data-mode="d
       <a href="#home">Home</a><a href="#price">Price</a><a href="#cake-pops">Cake Pops</a><a href="#bakehouse">Bakehouse Specialties</a><a href="#order">Order</a><a href="#contact">Contact</a><a href="#about">About</a><a href="#gallery">Gallery</a>
     </nav>
     <a class="phone" href="tel:5012760212">1 (501) 276-0212</a>
-    <button class="mode-btn" id="modeBtn" type="button" aria-label="Switch to night mode"><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></svg></button>
   </div>
 </header>
 
@@ -4641,11 +4640,11 @@ addEventListener('hashchange',route); route();
 })();
 </script>
 
-<script src="games/catch.js?v=1794179792"></script>
-<script src="games/stack.js?v=1794179792"></script>
-<script src="games/road.js?v=1794179792"></script>
-<script src="games/pop.js?v=1794179792"></script>
-<script src="games/farm.js?v=1794179792"></script>
+<script src="games/catch.js?v=1794179954"></script>
+<script src="games/stack.js?v=1794179954"></script>
+<script src="games/road.js?v=1794179954"></script>
+<script src="games/pop.js?v=1794179954"></script>
+<script src="games/farm.js?v=1794179954"></script>
 <script>
 /* ===== Piggy Dipper arcade hub ===== */
 (function(){
@@ -4705,14 +4704,12 @@ addEventListener('hashchange',route); route();
 
 </script>
 <script>
-/* ---------- day / night ---------- */
+/* ---------- day / night follows the device's light or dark setting ---------- */
 (function(){
-  const M=window.__pdMode,btn=document.getElementById('modeBtn'),root=document.documentElement;if(!M||!btn)return;
-  function label(){const night=root.dataset.mode==='night';btn.setAttribute('aria-label',night?'Switch to day mode':'Switch to night mode');btn.title=night?'Day mode':'Night mode'}
-  function set(m){root.classList.add('pd-fade');M.apply(m);label();setTimeout(()=>root.classList.remove('pd-fade'),700)}
-  btn.addEventListener('click',()=>{const m=root.dataset.mode==='night'?'day':'night';try{localStorage.setItem('pd-mode',JSON.stringify({m,t:Date.now()}))}catch(e){}set(m)});
-  setInterval(()=>{const m=M.pick();if(m!==root.dataset.mode)set(m)},60000);
-  label();
+  const M=window.__pdMode,root=document.documentElement;if(!M||!M.q)return;
+  function sync(){const m=M.pick();if(m===root.dataset.mode)return;root.classList.add('pd-fade');M.apply(m);setTimeout(()=>root.classList.remove('pd-fade'),700)}
+  if(M.q.addEventListener)M.q.addEventListener('change',sync);else if(M.q.addListener)M.q.addListener(sync);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});
 })();
 
 </script>
